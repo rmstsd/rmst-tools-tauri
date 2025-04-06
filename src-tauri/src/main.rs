@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    rmst_tools_tauri_lib::run()
+  rmst_tools_tauri_lib::run()
 }

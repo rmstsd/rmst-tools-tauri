@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.rmst-tools-tauri.app",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "pnpm dev-web",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
@@ -12,7 +12,28 @@
   "app": {
     "windows": [
       {
-        "title": "rmst-tools-tauri",
+        "label": "setting",
+        "title": "setting",
+        "url": "index.html/#/setting",
+        "visible": false,
+        "width": 800,
+        "height": 600
+      },
+      {
+        "label": "openFolder",
+        "title": "openFolder",
+        "url": "index.html/#/openFolder",
+        "center": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "visible": false,
+        "decorations": false
+      },
+      {
+        "label": "quickInput",
+        "title": "quickInput",
+        "url": "index.html/#/quickInput",
+        "visible": false,
         "width": 800,
         "height": 600
       }
@@ -24,12 +45,6 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
   }
 }
