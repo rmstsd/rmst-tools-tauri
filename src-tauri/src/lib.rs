@@ -20,13 +20,19 @@ pub fn run() {
     }))
     .plugin(
       tauri_plugin_global_shortcut::Builder::new()
-        .with_shortcuts(["ctrl+space"])?
+        .with_shortcuts(["ctrl+space"])
+        .unwrap()
         .with_handler(|app, shortcut, event| {
           if event.state == ShortcutState::Pressed {
             if shortcut.matches(Modifiers::CONTROL, Code::Space) {
               let openFolderWindows = app.get_webview_window("openFolder").unwrap();
-              openFolderWindows.show();
-              openFolderWindows.set_focus();
+
+              if openFolderWindows.is_visible().unwrap() {
+                openFolderWindows.hide();
+              } else {
+                openFolderWindows.show();
+                openFolderWindows.set_focus();
+              }
             }
           }
         })
