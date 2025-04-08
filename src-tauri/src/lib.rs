@@ -2,7 +2,7 @@
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, TrayIconBuilder, TrayIconEvent};
-use tauri::{webview, AppHandle, Manager, WindowEvent};
+use tauri::{webview, AppHandle, LogicalSize, Manager, WindowEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -10,6 +10,20 @@ use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 fn greet(name: &str) -> String {
   println!("{name:?}");
   format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+#[tauri::command(async)]
+fn openWin(app: AppHandle) {
+  println!("open win");
+
+  let webview_window = tauri::WebviewWindowBuilder::new(
+    &app,
+    "label",
+    tauri::WebviewUrl::App("https://www.bilibili.com/".into()),
+  )
+  .inner_size(800.0, 600.0)
+  .build()
+  .unwrap();
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -40,13 +54,13 @@ pub fn run() {
     )
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![greet])
+    .invoke_handler(tauri::generate_handler![openWin])
     .setup(|app| {
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;
       let quit_i = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
-
       let separator = &PredefinedMenuItem::separator(app).unwrap();
 
-      let menu = Menu::with_items(app, &[&m2, &quit_i, separator])?;
+      let menu = Menu::with_items(app, &[&m2, separator, &quit_i])?;
       let tray = TrayIconBuilder::new()
         .menu(&menu)
         .show_menu_on_left_click(false)
@@ -56,7 +70,11 @@ pub fn run() {
             println!("click quit")
           }
           "setting" => {
-            let settingWindow = app.get_webview_window("setting").unwrap();
+            let settingWindow: tauri::WebviewWindow = app.get_webview_window("setting").unwrap();
+
+            if settingWindow.is_minimized().unwrap_or(false) {
+              settingWindow.unminimize();
+            }
 
             settingWindow.show();
             settingWindow.set_focus();
@@ -80,11 +98,13 @@ pub fn run() {
       return Ok(());
     })
     .on_window_event(|window, evt| match evt {
-      WindowEvent::CloseRequested { api, .. } => {
-        api.prevent_close();
-
-        window.hide().unwrap();
-      }
+      WindowEvent::CloseRequested { api, .. } => match window.label() {
+        "setting" | "openFolder" | "quickInput" => {
+          api.prevent_close();
+          window.hide().unwrap();
+        }
+        _ => {}
+      },
       _ => {}
     })
     .run(tauri::generate_context!())
