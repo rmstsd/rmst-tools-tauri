@@ -1,34 +1,18 @@
 #![allow(warnings)]
 
+mod commands;
+
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, TrayIconBuilder, TrayIconEvent};
 use tauri::{webview, AppHandle, LogicalSize, Manager, WindowEvent};
+use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
-
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-  println!("{name:?}");
-  format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
-#[tauri::command(async)]
-fn openWin(app: AppHandle) {
-  println!("open win");
-
-  let webview_window = tauri::WebviewWindowBuilder::new(
-    &app,
-    "label",
-    tauri::WebviewUrl::App("https://www.bilibili.com/".into()),
-  )
-  .inner_size(800.0, 600.0)
-  .build()
-  .unwrap();
-}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    .plugin(tauri_plugin_dialog::init())
+    .plugin(tauri_plugin_store::Builder::new().build())
     .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
       let _ = show_window(app);
     }))
@@ -53,8 +37,10 @@ pub fn run() {
         .build(),
     )
     .plugin(tauri_plugin_opener::init())
-    .invoke_handler(tauri::generate_handler![greet])
-    .invoke_handler(tauri::generate_handler![openWin])
+    .invoke_handler(tauri::generate_handler![commands::greet])
+    .invoke_handler(tauri::generate_handler![commands::openWin])
+    .invoke_handler(tauri::generate_handler![commands::importSetting])
+    .invoke_handler(tauri::generate_handler![commands::saveSetting])
     .setup(|app| {
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;
       let quit_i = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
