@@ -36,11 +36,15 @@ pub fn run() {
         })
         .build(),
     )
+    .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_opener::init())
-    .invoke_handler(tauri::generate_handler![commands::greet])
-    .invoke_handler(tauri::generate_handler![commands::openWin])
-    .invoke_handler(tauri::generate_handler![commands::importSetting])
-    .invoke_handler(tauri::generate_handler![commands::saveSetting])
+    .invoke_handler(tauri::generate_handler![
+      commands::greet,
+      commands::openWin,
+      commands::importSetting,
+      commands::exportSetting,
+      commands::saveSetting
+    ])
     .setup(|app| {
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;
       let quit_i = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;

@@ -35,7 +35,7 @@
   const saveHandler = () => {
     console.log(state.formValues)
 
-    invoke('saveSetting', state.formValues)
+    invoke('saveSetting', { settingData: JSON.stringify(state.formValues) })
   }
 
   const exportSetting = () => {}

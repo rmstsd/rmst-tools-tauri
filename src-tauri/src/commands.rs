@@ -1,6 +1,9 @@
+use serde_json::json;
 use std::fs;
 use tauri::AppHandle;
+use tauri::Wry;
 use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_store::StoreExt;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -41,6 +44,17 @@ pub fn importSetting(app: AppHandle) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn saveSetting(settingData: String) {
+pub fn exportSetting(app: AppHandle) {
+  dbg!("exportSetting");
+}
+
+#[tauri::command]
+pub fn saveSetting(app: AppHandle, settingData: String) {
   println!("{settingData:#?}");
+
+  let store = app.store("store.json").unwrap();
+  store.set("some-key", json!({ "value": 5 }));
+
+  let ans = store.get("some-key");
+  println!("{ans:#?}");
 }
