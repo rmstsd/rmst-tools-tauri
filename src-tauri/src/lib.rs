@@ -1,6 +1,7 @@
 #![allow(warnings)]
 
 mod commands;
+mod localStore;
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, TrayIconBuilder, TrayIconEvent};
@@ -43,7 +44,8 @@ pub fn run() {
       commands::openWin,
       commands::importSetting,
       commands::exportSetting,
-      commands::saveSetting
+      commands::saveSetting,
+      commands::getSetting
     ])
     .setup(|app| {
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;
