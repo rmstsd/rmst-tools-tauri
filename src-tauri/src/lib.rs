@@ -45,7 +45,8 @@ pub fn run() {
       commands::importSetting,
       commands::exportSetting,
       commands::saveSetting,
-      commands::getSetting
+      commands::getSetting,
+      commands::getHistoryOpenedUrls
     ])
     .setup(|app| {
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;

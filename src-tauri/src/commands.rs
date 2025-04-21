@@ -1,6 +1,11 @@
+use serde::de::value;
+use serde_json::from_reader;
 use serde_json::json;
+use serde_json::to_string;
 use serde_json::Value;
 use std::fs;
+use std::fs::File;
+use std::io::BufReader;
 use std::vec;
 use tauri::AppHandle;
 use tauri::Wry;
@@ -37,6 +42,8 @@ pub fn importSetting(app: AppHandle) {
       let path: String = path.to_string();
 
       let content = fs::read_to_string(path).expect("Unable to read file");
+
+      // let content2: SettingData = serde_json::from_reader(fs::File::open(path).unwrap()).unwrap();
 
       saveSetting(app, content.clone());
     }
@@ -79,14 +86,32 @@ pub fn getSetting(app: AppHandle) -> Value {
   let val = store.get("setting");
 
   match val {
-    Some(val) => {
-      dbg!(&val);
-      let t = val.to_string();
-      dbg!(&t);
+    Some(val) => val,
+    None => Value::Null,
+  }
+}
 
+#[tauri::command]
+pub fn getHistoryOpenedUrls(app: AppHandle) -> Value {
+  let store = app.store("store.json").unwrap();
+  let val = store.get("historyOpenedUrls");
+
+  let aaa = Some(9);
+
+  match val {
+    Some(val) => {
+      dbg!("val", &val);
       val
     }
-    None => Value::Null,
+    None => {
+      // let val: Vec<String> = vec![];
+      // let sv: Result<String, serde_json::Error> = to_string(val);
+
+      let emp = serde_json::from_value(json!([1])).unwrap();
+
+      dbg!("emp", &emp);
+      emp
+    }
   }
 }
 
