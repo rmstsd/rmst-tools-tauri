@@ -41,11 +41,14 @@ pub fn importSetting(app: AppHandle) {
     Some(path) => {
       let path: String = path.to_string();
 
-      let content = fs::read_to_string(path).expect("Unable to read file");
+      // let content = fs::read_to_string(path).expect("Unable to read file");
+
+      let file: File = File::open(path).unwrap();
+      let content = serde_json::from_reader(file).unwrap();
 
       // let content2: SettingData = serde_json::from_reader(fs::File::open(path).unwrap()).unwrap();
 
-      saveSetting(app, content.clone());
+      saveSetting(app, content);
     }
     None => {}
   }
@@ -77,7 +80,7 @@ pub fn saveSetting(app: AppHandle, settingData: String) {
 
   dbg!("saveSetting", &settingData);
 
-  store.set("setting", settingData);
+  store.set("setting", vec![124]);
 }
 
 #[tauri::command]
@@ -96,8 +99,6 @@ pub fn getHistoryOpenedUrls(app: AppHandle) -> Value {
   let store = app.store("store.json").unwrap();
   let val = store.get("historyOpenedUrls");
 
-  let aaa = Some(9);
-
   match val {
     Some(val) => {
       dbg!("val", &val);
@@ -107,7 +108,7 @@ pub fn getHistoryOpenedUrls(app: AppHandle) -> Value {
       // let val: Vec<String> = vec![];
       // let sv: Result<String, serde_json::Error> = to_string(val);
 
-      let emp = serde_json::from_value(json!([1])).unwrap();
+      let emp = serde_json::from_value(json!([])).unwrap();
 
       dbg!("emp", &emp);
       emp

@@ -14,8 +14,8 @@ export default function Setting() {
   const getSettingData = () => {
     invoke('getSetting').then((data: string) => {
       console.log(data)
-      const dataObject = JSON.parse(data)
-      form.setFieldsValue(dataObject)
+      // const dataObject = JSON.parse(data)
+      // form.setFieldsValue(dataObject)
     })
   }
 
@@ -172,7 +172,7 @@ const OpenWin = () => {
 
   useInterval(
     () => {
-      updateOpenedUrls()
+      // updateOpenedUrls()
     },
     2000,
     { immediate: true }
@@ -182,7 +182,7 @@ const OpenWin = () => {
     const urls: string[] = await invoke('getHistoryOpenedUrls')
 
     console.log('urls', urls)
-    setHistoryOpenedUrls(urls)
+    // setHistoryOpenedUrls(urls)
   }
 
   const Open_Url_Win = (url: string) => {
@@ -190,7 +190,7 @@ const OpenWin = () => {
   }
 
   return (
-    <div>
+    <div style={{ paddingRight: '10%' }}>
       <Form form={form}>
         <Form.Item label="opened url" field="url" rules={[{ required: true, type: 'url' }]}>
           <Input placeholder="http://www.example.com" />
