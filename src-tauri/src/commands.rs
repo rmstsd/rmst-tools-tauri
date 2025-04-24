@@ -41,14 +41,12 @@ pub fn importSetting(app: AppHandle) {
     Some(path) => {
       let path: String = path.to_string();
 
-      // let content = fs::read_to_string(path).expect("Unable to read file");
-
-      let file: File = File::open(path).unwrap();
-      let content = serde_json::from_reader(file).unwrap();
+      let content = fs::read_to_string(path).expect("Unable to read file");
+      let data = serde_json::from_str(content.as_str()).unwrap();
 
       // let content2: SettingData = serde_json::from_reader(fs::File::open(path).unwrap()).unwrap();
 
-      saveSetting(app, content);
+      // saveSetting(app, content);
     }
     None => {}
   }
