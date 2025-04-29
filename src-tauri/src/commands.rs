@@ -1,7 +1,11 @@
 use serde::de::value;
+use serde::Deserialize;
+use serde::Serialize;
 use serde_json::from_reader;
+use serde_json::from_value;
 use serde_json::json;
 use serde_json::to_string;
+use serde_json::to_value;
 use serde_json::Value;
 use std::fs;
 use std::fs::File;
@@ -41,11 +45,34 @@ pub fn importSetting(app: AppHandle) {
     Some(path) => {
       let path: String = path.to_string();
 
-      let content = fs::read_to_string(path).expect("Unable to read file");
-      let data = serde_json::from_str(content.as_str()).unwrap();
+      println!("{path:#?}");
 
-      // let content2: SettingData = serde_json::from_reader(fs::File::open(path).unwrap()).unwrap();
+      // let content = fs::read_to_string(path).expect("Unable to read file");
+      // let data: SettingData = serde_json::from_str(content.as_str()).unwrap();
+      // dbg!(&data);
 
+      let opened = fs::File::open(path);
+
+      match opened {
+        Ok(val) => {
+          // json 里的 数据和 结构体不一致会导致 error
+          let data: Result<SettingData, serde_json::Error> = serde_json::from_reader(val);
+
+          match data {
+            Ok(val) => {
+              println!("{val:#?}");
+            }
+            Err(err) => {
+              dbg!(&err);
+            }
+          }
+        }
+        Err(err) => {
+          dbg!(&err);
+        }
+      }
+
+      // let content: SettingData = serde_json::from_reader(fs::File::open(path).unwrap()).unwrap();
       // saveSetting(app, content);
     }
     None => {}
@@ -73,12 +100,23 @@ pub fn exportSetting(app: AppHandle) {
 }
 
 #[tauri::command]
-pub fn saveSetting(app: AppHandle, settingData: String) {
+pub fn saveSetting(app: AppHandle, settingData: SettingData) {
   let store = app.store("store.json").unwrap();
 
   dbg!("saveSetting", &settingData);
 
-  store.set("setting", vec![124]);
+  let val = to_value(settingData);
+
+  match val {
+    Ok(value) => {
+      dbg!(&value);
+
+      store.set("setting", value);
+    }
+    Err(err) => {
+      dbg!(&err);
+    }
+  }
 }
 
 #[tauri::command]
@@ -114,7 +152,9 @@ pub fn getHistoryOpenedUrls(app: AppHandle) -> Value {
   }
 }
 
-struct SettingData {
+#[derive(Debug, Serialize, Deserialize)]
+
+pub struct SettingData {
   cmdPath: String,
   editorPaths: Vec<String>,
   projectPaths: Vec<String>,

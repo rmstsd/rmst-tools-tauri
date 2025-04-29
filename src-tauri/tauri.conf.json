@@ -17,7 +17,8 @@
         "url": "index.html/#/setting",
         "visible": false,
         "width": 1200,
-        "height": 800
+        "height": 800,
+        "center": true
       },
       {
         "label": "openFolder",

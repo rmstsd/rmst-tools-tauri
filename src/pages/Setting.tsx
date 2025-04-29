@@ -27,7 +27,7 @@ export default function Setting() {
 
   const saveHandler = () => {
     const formValues = form.getFieldsValue()
-    invoke('saveSetting', { settingData: JSON.stringify(formValues) })
+    invoke('saveSetting', { settingData: formValues })
   }
 
   const exportSetting = () => {
