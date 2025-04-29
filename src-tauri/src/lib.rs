@@ -46,6 +46,7 @@ pub fn run() {
       commands::exportSetting,
       commands::saveSetting,
       commands::getSetting,
+      commands::clearStore,
       commands::getHistoryOpenedUrls
     ])
     .setup(|app| {

@@ -12,15 +12,15 @@ export default function Setting() {
   }, [])
 
   const getSettingData = () => {
-    invoke('getSetting').then((data: string) => {
-      console.log(data)
-      // const dataObject = JSON.parse(data)
-      // form.setFieldsValue(dataObject)
+    form.resetFields()
+
+    invoke('getSetting').then((data: SettingData) => {
+      form.setFieldsValue(data)
     })
   }
 
   const importSetting = () => {
-    invoke('importSetting').then((res: string) => {
+    invoke('importSetting').then(() => {
       getSettingData()
     })
   }
@@ -39,7 +39,9 @@ export default function Setting() {
   }
 
   const clearStore = () => {
-    invoke('clearStore')
+    invoke('clearStore').then(() => {
+      getSettingData()
+    })
   }
 
   return (
@@ -51,7 +53,7 @@ export default function Setting() {
             <Button type="primary" onClick={saveHandler}>
               保存
             </Button>
-            <Button onClick={getSettingData}>加载设置数据</Button>
+            <Button onClick={getSettingData}>刷新</Button>
             <Button.Group>
               <Button type="outline" onClick={exportSetting}>
                 导出
@@ -74,7 +76,7 @@ export default function Setting() {
                   {fields.map((item, index) => {
                     return (
                       <div key={item.key} className="flex gap-[10px]">
-                        <Form.Item field={`${item.field}.path`} className="flex-grow">
+                        <Form.Item field={`${item.field}`} className="flex-grow">
                           <Input placeholder="例如: D:\Microsoft VS Code\Code.exe" />
                         </Form.Item>
                         <Button

@@ -16,6 +16,8 @@ use tauri::Wry;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_store::StoreExt;
 
+static Setting_Key: &str = "setting";
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 pub fn greet(name: &str) -> String {
@@ -60,7 +62,8 @@ pub fn importSetting(app: AppHandle) {
 
           match data {
             Ok(val) => {
-              println!("{val:#?}");
+              dbg!(&val);
+              saveSetting(app, val);
             }
             Err(err) => {
               dbg!(&err);
@@ -94,7 +97,7 @@ pub fn exportSetting(app: AppHandle) {
   dbg!(file_path.to_string());
 
   let store = app.store("store.json").unwrap();
-  let ans = store.get("setting");
+  let ans = store.get(Setting_Key);
 
   fs::write(file_path.to_string(), "aa").expect("Unable to read file");
 }
@@ -111,7 +114,7 @@ pub fn saveSetting(app: AppHandle, settingData: SettingData) {
     Ok(value) => {
       dbg!(&value);
 
-      store.set("setting", value);
+      store.set(Setting_Key, value);
     }
     Err(err) => {
       dbg!(&err);
@@ -122,12 +125,20 @@ pub fn saveSetting(app: AppHandle, settingData: SettingData) {
 #[tauri::command]
 pub fn getSetting(app: AppHandle) -> Value {
   let store = app.store("store.json").unwrap();
-  let val = store.get("setting");
+  let val = store.get(Setting_Key);
 
   match val {
     Some(val) => val,
     None => Value::Null,
   }
+}
+
+#[tauri::command]
+pub async fn clearStore(app: AppHandle) -> Result<(), String> {
+  let store = app.store("store.json").unwrap();
+  store.delete(Setting_Key);
+
+  Ok(())
 }
 
 #[tauri::command]
@@ -155,8 +166,8 @@ pub fn getHistoryOpenedUrls(app: AppHandle) -> Value {
 #[derive(Debug, Serialize, Deserialize)]
 
 pub struct SettingData {
-  cmdPath: String,
-  editorPaths: Vec<String>,
-  projectPaths: Vec<String>,
-  notes: Vec<String>,
+  cmdPath: Option<String>,
+  editorPaths: Option<Vec<String>>,
+  projectPaths: Option<Vec<String>>,
+  notes: Option<Vec<String>>,
 }

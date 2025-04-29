@@ -1,7 +1,5 @@
 export type SettingData = {
-  editorPaths: {
-    path: string
-  }[]
+  editorPaths: string[]
   cmdPath: string
   projectPaths: string[]
   notes: string[]
