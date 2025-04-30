@@ -193,7 +193,7 @@ const OpenWin = () => {
 
   return (
     <div style={{ paddingRight: '10%' }}>
-      <Form form={form}>
+      <Form form={form} initialValues={{ url: 'https://www.bilibili.com/' }}>
         <Form.Item label="opened url" field="url" rules={[{ required: true, type: 'url' }]}>
           <Input placeholder="http://www.example.com" />
         </Form.Item>

@@ -1,3 +1,4 @@
+use rand::random;
 use serde::de::value;
 use serde::Deserialize;
 use serde::Serialize;
@@ -17,6 +18,7 @@ use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_store::StoreExt;
 
 static Setting_Key: &str = "setting";
+static HistoryOpenedUrls_Key: &str = "historyOpenedUrls";
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -26,17 +28,35 @@ pub fn greet(name: &str) -> String {
 }
 
 #[tauri::command(async)]
-pub fn openWin(app: AppHandle) {
-  println!("open win");
+pub fn openWin(app: AppHandle, url: &str) {
+  dbg!(&url);
 
-  let webview_window = tauri::WebviewWindowBuilder::new(
-    &app,
-    "label",
-    tauri::WebviewUrl::App("https://www.bilibili.com/".into()),
-  )
-  .inner_size(800.0, 600.0)
-  .build()
-  .unwrap();
+  let label: i32 = random();
+  let label = label.to_string();
+
+  let webview_window =
+    tauri::WebviewWindowBuilder::new(&app, label, tauri::WebviewUrl::App(url.into()))
+      .inner_size(800.0, 600.0)
+      .build();
+
+  match webview_window {
+    Ok(val) => {
+      let store = app.store("store.json").unwrap();
+      let val = store.get(HistoryOpenedUrls_Key).unwrap_or(default); // 了解区别
+
+      match val {
+        Some(val) => {
+          let list: Vec<String> = from_value(value).unwrap();
+        }
+        None => {
+          let list: Vec<String> = from_value(value).unwrap();
+        }
+      }
+    }
+    Err(err) => {
+      dbg!(&err);
+    }
+  }
 }
 
 #[tauri::command]
@@ -144,7 +164,7 @@ pub async fn clearStore(app: AppHandle) -> Result<(), String> {
 #[tauri::command]
 pub fn getHistoryOpenedUrls(app: AppHandle) -> Value {
   let store = app.store("store.json").unwrap();
-  let val = store.get("historyOpenedUrls");
+  let val = store.get(HistoryOpenedUrls_Key);
 
   match val {
     Some(val) => {
