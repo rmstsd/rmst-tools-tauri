@@ -13,9 +13,14 @@ use std::fs::File;
 use std::io::BufReader;
 use std::vec;
 use tauri::AppHandle;
+use tauri::Manager;
+use tauri::WebviewWindow;
 use tauri::Wry;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_store::StoreExt;
+use urlencoding::encode;
+
+static Store_Key: &str = "store.json";
 
 static Setting_Key: &str = "setting";
 static HistoryOpenedUrls_Key: &str = "historyOpenedUrls";
@@ -25,38 +30,6 @@ static HistoryOpenedUrls_Key: &str = "historyOpenedUrls";
 pub fn greet(name: &str) -> String {
   println!("{name:?}");
   format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
-#[tauri::command(async)]
-pub fn openWin(app: AppHandle, url: &str) {
-  dbg!(&url);
-
-  let label: i32 = random();
-  let label = label.to_string();
-
-  let webview_window =
-    tauri::WebviewWindowBuilder::new(&app, label, tauri::WebviewUrl::App(url.into()))
-      .inner_size(800.0, 600.0)
-      .build();
-
-  match webview_window {
-    Ok(val) => {
-      let store = app.store("store.json").unwrap();
-      let val = store.get(HistoryOpenedUrls_Key).unwrap_or(default); // 了解区别
-
-      match val {
-        Some(val) => {
-          let list: Vec<String> = from_value(value).unwrap();
-        }
-        None => {
-          let list: Vec<String> = from_value(value).unwrap();
-        }
-      }
-    }
-    Err(err) => {
-      dbg!(&err);
-    }
-  }
 }
 
 #[tauri::command]
@@ -116,7 +89,7 @@ pub fn exportSetting(app: AppHandle) {
   println!("{file_path:#?}");
   dbg!(file_path.to_string());
 
-  let store = app.store("store.json").unwrap();
+  let store = app.store(Store_Key).unwrap();
   let ans = store.get(Setting_Key);
 
   fs::write(file_path.to_string(), "aa").expect("Unable to read file");
@@ -124,7 +97,7 @@ pub fn exportSetting(app: AppHandle) {
 
 #[tauri::command]
 pub fn saveSetting(app: AppHandle, settingData: SettingData) {
-  let store = app.store("store.json").unwrap();
+  let store = app.store(Store_Key).unwrap();
 
   dbg!("saveSetting", &settingData);
 
@@ -144,7 +117,7 @@ pub fn saveSetting(app: AppHandle, settingData: SettingData) {
 
 #[tauri::command]
 pub fn getSetting(app: AppHandle) -> Value {
-  let store = app.store("store.json").unwrap();
+  let store = app.store(Store_Key).unwrap();
   let val = store.get(Setting_Key);
 
   match val {
@@ -155,36 +128,71 @@ pub fn getSetting(app: AppHandle) -> Value {
 
 #[tauri::command]
 pub async fn clearStore(app: AppHandle) -> Result<(), String> {
-  let store = app.store("store.json").unwrap();
+  let store = app.store(Store_Key).unwrap();
   store.delete(Setting_Key);
 
   Ok(())
 }
 
+#[tauri::command(async)]
+pub fn openWin(app: AppHandle, url: String) {
+  dbg!(&url);
+
+  let label: i32 = random();
+  let label = label.to_string();
+
+  let webview_window =
+    tauri::WebviewWindowBuilder::new(&app, label, tauri::WebviewUrl::App(url.clone().into()))
+      .inner_size(1000.0, 700.0)
+      .build();
+
+  match webview_window {
+    Ok(val) => {
+      let store = app.store(Store_Key).unwrap();
+      let val = store.get(HistoryOpenedUrls_Key).unwrap_or(json!([])); // 了解区别
+
+      let mut list = from_value::<Vec<String>>(val).unwrap();
+      dbg!(&list);
+
+      if (!list.contains(&url)) {
+        list.insert(0, url);
+
+        if (list.len() > 5) {
+          list.pop();
+        }
+
+        store.set(HistoryOpenedUrls_Key, list);
+      }
+    }
+    Err(err) => {
+      dbg!(&err);
+    }
+  }
+}
+
 #[tauri::command]
 pub fn getHistoryOpenedUrls(app: AppHandle) -> Value {
-  let store = app.store("store.json").unwrap();
+  let store = app.store(Store_Key).unwrap();
   let val = store.get(HistoryOpenedUrls_Key);
 
   match val {
-    Some(val) => {
-      dbg!("val", &val);
-      val
-    }
+    Some(val) => val,
     None => {
-      // let val: Vec<String> = vec![];
-      // let sv: Result<String, serde_json::Error> = to_string(val);
-
       let emp = serde_json::from_value(json!([])).unwrap();
 
-      dbg!("emp", &emp);
       emp
     }
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[tauri::command]
+pub async fn clearHistoryOpenedUrls(app: AppHandle) -> Result<(), String> {
+  let store = app.store(Store_Key).unwrap();
+  store.delete(HistoryOpenedUrls_Key);
+  Ok(())
+}
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SettingData {
   cmdPath: Option<String>,
   editorPaths: Option<Vec<String>>,
