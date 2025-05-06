@@ -16,6 +16,8 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 use std::vec;
+use tauri::image::Image;
+use tauri::webview::PageLoadEvent;
 use tauri::AppHandle;
 use tauri::Listener;
 use tauri::LogicalSize;
@@ -141,6 +143,19 @@ pub async fn clearStore(app: AppHandle) -> Result<(), String> {
   Ok(())
 }
 
+#[tauri::command]
+pub async fn page_loaded(
+  app: tauri::AppHandle,
+  window: tauri::Window,
+  title: String,
+  icon: String,
+) -> Result<(), String> {
+  window.set_title(title.as_str());
+  window.set_icon(Image::from_path(icon.as_str()).unwrap());
+
+  Ok(())
+}
+
 #[tauri::command(async)]
 pub fn openWin(app: AppHandle, url: String) {
   dbg!(&url);
@@ -148,36 +163,40 @@ pub fn openWin(app: AppHandle, url: String) {
   let label: i32 = random();
   let label = label.to_string();
 
-  let webview_window =
+  let ww: WebviewWindow =
     tauri::WebviewWindowBuilder::new(&app, label, tauri::WebviewUrl::App(url.clone().into()))
       .inner_size(1000.0, 700.0)
-      .build();
+      .build()
+      .expect("webview_window create error 啊");
 
-  match webview_window {
-    Ok(ww) => {
-      ww.once("created", |evt| {
-        dbg!(&345);
-      });
-
-      let store = app.store(Store_Key).unwrap();
-      let listVal = store.get(HistoryOpenedUrls_Key).unwrap_or(json!([]));
-
-      let mut list = from_value::<Vec<String>>(listVal).unwrap();
-      dbg!(&list);
-
-      if (!list.contains(&url)) {
-        list.insert(0, url);
-
-        if (list.len() > 5) {
-          list.pop();
+  ww.eval(
+    r#"
+      window.addEventListener('load', function() {
+        const title = document.title
+        let icon = ''
+        const iconElements = document.querySelectorAll('link[rel*="icon"]')
+        if (iconElements.length > 0) {
+          icon = iconElements[0].href
         }
 
-        store.set(HistoryOpenedUrls_Key, list);
-      }
+        window.__TAURI_INTERNALS__.invoke('page_loaded', { title, icon });
+      });
+  "#,
+  );
+
+  let store = app.store(Store_Key).unwrap();
+  let listVal = store.get(HistoryOpenedUrls_Key).unwrap_or(json!([]));
+
+  let mut list = from_value::<Vec<String>>(listVal).unwrap();
+
+  if (!list.contains(&url)) {
+    list.insert(0, url);
+
+    if (list.len() > 5) {
+      list.pop();
     }
-    Err(err) => {
-      dbg!(&err);
-    }
+
+    store.set(HistoryOpenedUrls_Key, list);
   }
 }
 
@@ -289,10 +308,14 @@ pub fn getProjectNamesTree(app: AppHandle) -> Value {
   let blackList = vec!["$RECYCLE.BIN", "System Volume Information"];
   let blackStartWithChar = vec!["_", "$", ".", "-"];
 
-  let val: Value = (getSetting(app));
+  let val: Value = getSetting(app);
 
-  let settingData: SettingData = from_value(val).unwrap();
-  dbg!(&settingData.projectPaths);
+  let settingData: SettingData = from_value(val).unwrap_or(SettingData {
+    cmdPath: Some("".to_string()),
+    editorPaths: Some(vec![]),
+    projectPaths: Some(vec![]),
+    notes: Some(vec![]),
+  });
 
   let projectPaths: Vec<String> = settingData.projectPaths.unwrap();
 

@@ -26,8 +26,13 @@ pub fn run() {
             if shortcut.matches(Modifiers::CONTROL, Code::Space) {
               let openFolderWindows = app.get_webview_window("openFolder").unwrap();
 
-              if openFolderWindows.is_visible().unwrap() {
-                openFolderWindows.hide();
+              let isVisible = openFolderWindows.is_visible().unwrap_or_default();
+              if isVisible {
+                if openFolderWindows.is_focused().expect("is_focused msg") {
+                  openFolderWindows.hide();
+                } else {
+                  openFolderWindows.set_focus();
+                }
               } else {
                 openFolderWindows.show();
                 openFolderWindows.set_focus();
@@ -53,7 +58,8 @@ pub fn run() {
       commands::getProjectNamesTree,
       commands::openFolderEditor,
       commands::hideDirWindow,
-      commands::setDirWindowSize
+      commands::setDirWindowSize,
+      commands::page_loaded
     ])
     .setup(|app| {
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;
@@ -67,7 +73,7 @@ pub fn run() {
         .icon(app.default_window_icon().unwrap().clone())
         .on_menu_event(|app, event| match event.id.as_ref() {
           "quit" => {
-            println!("click quit")
+            app.exit(0);
           }
           "setting" => {
             let settingWindow: tauri::WebviewWindow = app.get_webview_window("setting").unwrap();
@@ -115,6 +121,12 @@ pub fn run() {
         }
       }
       _ => {}
+    })
+    .on_webview_event(|window, event| {
+      dbg!(&event);
+    })
+    .on_page_load(|ww, payload| {
+      dbg!(&payload.event());
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
