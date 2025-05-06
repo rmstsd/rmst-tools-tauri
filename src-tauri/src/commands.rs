@@ -1,3 +1,4 @@
+use port_killer::kill;
 use rand::random;
 use serde::de::value;
 use serde::Deserialize;
@@ -9,11 +10,17 @@ use serde_json::to_string;
 use serde_json::to_value;
 use serde_json::Value;
 use std::fs;
+use std::fs::metadata;
+use std::fs::read_dir;
 use std::fs::File;
 use std::io::BufReader;
+use std::path::Path;
 use std::vec;
 use tauri::AppHandle;
+use tauri::Listener;
+use tauri::LogicalSize;
 use tauri::Manager;
+use tauri::Size;
 use tauri::WebviewWindow;
 use tauri::Wry;
 use tauri_plugin_dialog::DialogExt;
@@ -147,11 +154,15 @@ pub fn openWin(app: AppHandle, url: String) {
       .build();
 
   match webview_window {
-    Ok(val) => {
-      let store = app.store(Store_Key).unwrap();
-      let val = store.get(HistoryOpenedUrls_Key).unwrap_or(json!([])); // 了解区别
+    Ok(ww) => {
+      ww.once("created", |evt| {
+        dbg!(&345);
+      });
 
-      let mut list = from_value::<Vec<String>>(val).unwrap();
+      let store = app.store(Store_Key).unwrap();
+      let listVal = store.get(HistoryOpenedUrls_Key).unwrap_or(json!([]));
+
+      let mut list = from_value::<Vec<String>>(listVal).unwrap();
       dbg!(&list);
 
       if (!list.contains(&url)) {
@@ -192,10 +203,178 @@ pub async fn clearHistoryOpenedUrls(app: AppHandle) -> Result<(), String> {
   Ok(())
 }
 
+#[tauri::command]
+pub fn killPort(port: u16) -> Result<bool, bool> {
+  dbg!(&port);
+  let r = kill_process_by_port(port);
+  match r {
+    Ok(()) => Ok(true),
+    Err(err) => {
+      dbg!(&err);
+
+      Err(false)
+    }
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SettingData {
   cmdPath: Option<String>,
   editorPaths: Option<Vec<String>>,
   projectPaths: Option<Vec<String>>,
   notes: Option<Vec<String>>,
+}
+
+use std::process::Command;
+fn kill_process_by_port(port: u16) -> Result<(), std::io::Error> {
+  #[cfg(target_os = "windows")]
+  {
+    // 在 Windows 上查找占用指定端口的进程 ID
+    let output = Command::new("cmd")
+      .args(&["/C", &format!("netstat -ano | findstr :{}", port)])
+      .output()?;
+    let output_str = String::from_utf8_lossy(&output.stdout);
+    for line in output_str.lines() {
+      let parts: Vec<&str> = line.split_whitespace().collect();
+      if parts.len() >= 5 {
+        let pid_str = parts[4];
+        if let Ok(pid) = pid_str.parse::<u32>() {
+          // 杀死找到的进程
+          Command::new("taskkill")
+            .args(&["/F", "/PID", &pid.to_string()])
+            .output()?;
+        }
+      }
+    }
+  }
+  #[cfg(target_os = "linux")]
+  {
+    // 在 Linux 上查找占用指定端口的进程 ID
+    let output = Command::new("sh")
+      .arg("-c")
+      .arg(&format!("lsof -t -i:{}", port))
+      .output()?;
+    let output_str = String::from_utf8_lossy(&output.stdout);
+    for line in output_str.lines() {
+      if let Ok(pid) = line.parse::<u32>() {
+        // 杀死找到的进程
+        Command::new("kill")
+          .args(&["-9", &pid.to_string()])
+          .output()?;
+      }
+    }
+  }
+  #[cfg(target_os = "macos")]
+  {
+    // 在 macOS 上查找占用指定端口的进程 ID
+    let output = Command::new("sh")
+      .arg("-c")
+      .arg(&format!("lsof -t -i:{}", port))
+      .output()?;
+    let output_str = String::from_utf8_lossy(&output.stdout);
+    for line in output_str.lines() {
+      if let Ok(pid) = line.parse::<u32>() {
+        // 杀死找到的进程
+        Command::new("kill")
+          .args(&["-9", &pid.to_string()])
+          .output()?;
+      }
+    }
+  }
+  Ok(())
+}
+
+#[tauri::command]
+pub fn getProjectNamesTree(app: AppHandle) -> Value {
+  let blackList = vec!["$RECYCLE.BIN", "System Volume Information"];
+  let blackStartWithChar = vec!["_", "$", ".", "-"];
+
+  let val: Value = (getSetting(app));
+
+  let settingData: SettingData = from_value(val).unwrap();
+  dbg!(&settingData.projectPaths);
+
+  let projectPaths: Vec<String> = settingData.projectPaths.unwrap();
+
+  let nv: Vec<NamesTree> = projectPaths
+    .into_iter()
+    .filter(|item| {
+      if let Ok(md) = metadata(Path::new(item)) {
+        md.is_dir()
+      } else {
+        false
+      }
+    })
+    .map(|item: String| {
+      let name = item.replace(r"\", "/");
+      let path = Path::new(item.as_str());
+
+      let children = read_dir(path)
+        .expect("msg")
+        .into_iter()
+        .map(|item| item.unwrap().file_name().to_string_lossy().to_string())
+        .filter(|item| {
+          !blackList.contains(&item.as_str())
+            && !blackStartWithChar.iter().any(|char| item.starts_with(char))
+        })
+        .collect();
+
+      let nt: NamesTree = NamesTree { name, children };
+
+      return nt;
+    })
+    .collect();
+
+  to_value(nv).unwrap()
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct NamesTree {
+  name: String,
+  children: Vec<String>,
+}
+
+#[tauri::command]
+pub async fn openFolderEditor(
+  app: tauri::AppHandle,
+  projectPath: String,
+  editorPath: String,
+) -> Result<(), String> {
+  dbg!(&projectPath);
+  dbg!(&editorPath);
+
+  // 执行外部命令示例
+  let output = Command::new(editorPath)
+    .arg(projectPath)
+    .output()
+    .expect("Failed to execute command");
+
+  if output.status.success() {
+    println!("打开成功");
+  } else {
+    println!("打开失败");
+  }
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn hideDirWindow(app: tauri::AppHandle, window: tauri::Window) -> Result<(), String> {
+  let win = app
+    .get_webview_window("openFolder")
+    .expect("经济技术电饭锅");
+  win.hide();
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn setDirWindowSize(app: tauri::AppHandle, height: f64) -> Result<(), String> {
+  let win = app
+    .get_webview_window("openFolder")
+    .expect("对方过后发过火");
+
+  win.set_size(Size::Logical(LogicalSize {
+    width: 800.0,
+    height,
+  }));
+  Ok(())
 }

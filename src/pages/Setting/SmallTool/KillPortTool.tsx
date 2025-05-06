@@ -1,6 +1,6 @@
 import { Button, Form, InputNumber, Message } from '@arco-design/web-react'
+import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useRef, useState } from 'react'
-import { killPort } from '@renderer/ipc/killPort'
 
 export default function KillPortTool() {
   const ref = useRef(null)
@@ -23,13 +23,14 @@ export default function KillPortTool() {
     await form.validate()
 
     setLoading(true)
-    killPort(form.getFieldValue('port'))
+
+    invoke('killPort', { port: form.getFieldValue('port') })
       .then(res => {
-        if (res.code === 0) {
-          Message.success({ content: res.stdout, position: 'bottom' })
-        } else {
-          Message.error({ content: res.stderr, position: 'bottom' })
-        }
+        console.log('res', res)
+        Message.success({ content: '成功', position: 'bottom' })
+      })
+      .catch(err => {
+        Message.error({ content: err, position: 'bottom' })
       })
       .finally(() => {
         setLoading(false)

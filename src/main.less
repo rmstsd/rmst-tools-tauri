@@ -32,3 +32,40 @@ strong {
     padding-top: 40px;
   }
 }
+
+.option-item {
+  &:hover {
+    color: #1d2129;
+    background-color: #f2f3f5;
+  }
+}
+
+.s-tipInfo {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 0 10px;
+  color: #777;
+  font-size: 18px;
+  border-left: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .arco-radio-group {
+    * {
+      transition-duration: 0s;
+    }
+  }
+}
+
+.open-dir {
+  .arco-select-option:not(.arco-select-option-hover):hover {
+    background-color: rgb(249, 249, 249);
+  }
+}
+
+[data-tauri-drag-region] {
+  app-region: drag
+}

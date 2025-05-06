@@ -7,7 +7,7 @@ import GitSetting from './GitSetting'
 export default function SmallTool() {
   return (
     <div className="p-[40px]">
-      {/* <KillPortTool /> */}
+      <KillPortTool />
 
       <Divider />
 

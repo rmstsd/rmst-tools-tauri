@@ -48,7 +48,12 @@ pub fn run() {
       commands::getSetting,
       commands::clearStore,
       commands::getHistoryOpenedUrls,
-      commands::clearHistoryOpenedUrls
+      commands::clearHistoryOpenedUrls,
+      commands::killPort,
+      commands::getProjectNamesTree,
+      commands::openFolderEditor,
+      commands::hideDirWindow,
+      commands::setDirWindowSize
     ])
     .setup(|app| {
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;
@@ -96,10 +101,19 @@ pub fn run() {
       WindowEvent::CloseRequested { api, .. } => match window.label() {
         "setting" | "openFolder" | "quickInput" => {
           api.prevent_close();
-          window.hide().unwrap();
+          window.hide();
         }
         _ => {}
       },
+      WindowEvent::Focused(focused) => {
+        if (window.label() == "openFolder") {
+          dbg!(&focused);
+
+          if (!focused) {
+            // window.hide();
+          }
+        }
+      }
       _ => {}
     })
     .run(tauri::generate_context!())
