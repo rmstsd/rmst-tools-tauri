@@ -114,8 +114,6 @@ pub fn run() {
       },
       WindowEvent::Focused(focused) => {
         if (window.label() == "openFolder") {
-          dbg!(&focused);
-
           if (!focused) {
             // let closure = || println!("异步任务");
             // let hand = tokio::spawn(async move {
@@ -123,7 +121,6 @@ pub fn run() {
             //   closure();
             // });
 
-            dbg!(&"哈哈哈");
             // window.hide();
           }
         }

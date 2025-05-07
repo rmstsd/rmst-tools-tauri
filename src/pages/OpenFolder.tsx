@@ -1,4 +1,4 @@
-import React, { Fragment, useLayoutEffect, useRef, useState } from 'react'
+import React, { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Divider, Input, Message, Radio } from '@arco-design/web-react'
 import path from 'path-browserify'
 import clsx from 'clsx'
@@ -16,6 +16,32 @@ import { invoke } from '@tauri-apps/api/core'
 //   setDirWindowSize
 // } from '@renderer/ipc/openDir'
 
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+
+interface Props {
+  onFocus?: () => void
+  onBlur?: () => void
+}
+
+export const useTauriFocus = () => {
+  useEffect(() => {
+    let timer
+    const appWindow = getCurrentWebviewWindow()
+
+    const debounced = ({ payload }) => {
+      if (payload) {
+        clearTimeout(timer)
+      } else {
+        timer = setTimeout(() => {
+          appWindow.hide()
+        }, 100)
+      }
+    }
+
+    appWindow.onFocusChanged(debounced)
+  }, [])
+}
+
 interface DirNamesTree {
   name: string
   children: string[]
@@ -29,6 +55,8 @@ const OpenFolder = () => {
 
   const [editorPaths, setEditorPaths] = useState<SettingData['editorPaths']>([])
   const [activeEditorIndex, setActiveEditorIndex] = useState(0)
+
+  useTauriFocus()
 
   useLayoutEffect(() => {
     getInitialData()
