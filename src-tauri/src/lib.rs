@@ -8,6 +8,7 @@ use tauri::tray::{MouseButton, TrayIconBuilder, TrayIconEvent};
 use tauri::{webview, AppHandle, LogicalSize, Manager, WindowEvent};
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
+use tokio::time::{sleep, Duration};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -116,6 +117,13 @@ pub fn run() {
           dbg!(&focused);
 
           if (!focused) {
+            // let closure = || println!("异步任务");
+            // let hand = tokio::spawn(async move {
+            //   sleep(Duration::from_millis(1000)).await;
+            //   closure();
+            // });
+
+            dbg!(&"哈哈哈");
             // window.hide();
           }
         }
