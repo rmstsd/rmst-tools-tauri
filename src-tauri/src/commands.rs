@@ -1,3 +1,8 @@
+use enigo::{
+  Button, Coordinate,
+  Direction::{Click, Press, Release},
+  Enigo, Key, Keyboard, Mouse, Settings,
+};
 use port_killer::kill;
 use rand::random;
 use serde::de::value;
@@ -13,9 +18,12 @@ use std::fs;
 use std::fs::metadata;
 use std::fs::read_dir;
 use std::fs::File;
+use std::io;
 use std::io::BufReader;
+use std::io::Read;
 use std::path::Path;
 use std::vec;
+use tauri::image;
 use tauri::image::Image;
 use tauri::webview::PageLoadEvent;
 use tauri::AppHandle;
@@ -25,6 +33,7 @@ use tauri::Manager;
 use tauri::Size;
 use tauri::WebviewWindow;
 use tauri::Wry;
+use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_store::StoreExt;
 use urlencoding::encode;
@@ -151,9 +160,17 @@ pub async fn page_loaded(
   icon: String,
 ) -> Result<(), String> {
   window.set_title(title.as_str());
-  window.set_icon(Image::from_path(icon.as_str()).unwrap());
 
   Ok(())
+}
+
+fn readFile(path: &str) -> io::Result<String> {
+  let mut f = File::open(path)?;
+  let mut buffer: String = String::new();
+
+  f.read_to_string(&mut buffer)?;
+
+  Ok(buffer)
 }
 
 #[tauri::command(async)]
@@ -165,24 +182,19 @@ pub fn openWin(app: AppHandle, url: String) {
 
   let ww: WebviewWindow =
     tauri::WebviewWindowBuilder::new(&app, label, tauri::WebviewUrl::App(url.clone().into()))
+      .title("rmst-tools")
       .inner_size(1000.0, 700.0)
       .build()
       .expect("webview_window create error 啊");
 
-  ww.eval(
-    r#"
-      window.addEventListener('load', function() {
-        const title = document.title
-        let icon = ''
-        const iconElements = document.querySelectorAll('link[rel*="icon"]')
-        if (iconElements.length > 0) {
-          icon = iconElements[0].href
-        }
+  ww.set_icon(Image::from_path("icons2/tray-icon.ico").unwrap());
 
-        window.__TAURI_INTERNALS__.invoke('page_loaded', { title, icon });
-      });
-  "#,
-  );
+  let data = readFile("icons2/ww-script.js").unwrap_or_default();
+  if (!data.is_empty()) {
+    dbg!(&"ww eval");
+
+    ww.eval(data.as_str());
+  }
 
   let store = app.store(Store_Key).unwrap();
   let listVal = store.get(HistoryOpenedUrls_Key).unwrap_or(json!([]));
@@ -399,5 +411,24 @@ pub async fn setDirWindowSize(app: tauri::AppHandle, height: f64) -> Result<(), 
     width: 800.0,
     height,
   }));
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn hideWindow(window: tauri::Window) -> Result<(), String> {
+  window.hide();
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn CopyAndPaste(app: AppHandle) -> Result<(), String> {
+  app.clipboard().write_text("asdasdas".to_string()).unwrap();
+
+  let mut enigo = Enigo::new(&Settings::default()).unwrap();
+  // Paste
+  enigo.key(Key::Control, Press);
+  enigo.key(Key::Unicode('v'), Click);
+  enigo.key(Key::Control, Release);
+
   Ok(())
 }

@@ -1,11 +1,14 @@
 #![allow(warnings)]
 
+// inputbot 全局快捷键 的库
+
 mod commands;
 mod localStore;
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, TrayIconBuilder, TrayIconEvent};
 use tauri::{webview, AppHandle, LogicalSize, Manager, WindowEvent};
+use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 use tokio::time::{sleep, Duration};
@@ -14,6 +17,7 @@ use tokio::time::{sleep, Duration};
 pub fn run() {
   tauri::Builder::default()
     .plugin(tauri_plugin_dialog::init())
+    .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_store::Builder::new().build())
     .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
       let _ = show_window(app);
@@ -60,9 +64,23 @@ pub fn run() {
       commands::openFolderEditor,
       commands::hideDirWindow,
       commands::setDirWindowSize,
-      commands::page_loaded
+      commands::page_loaded,
+      commands::hideWindow,
+      commands::CopyAndPaste
     ])
     .setup(|app| {
+      let ww = app.get_webview_window("openFolder").unwrap();
+      ww.eval(
+        r#"
+          document.addEventListener('keydown', evt => {
+            if (evt.code === 'Escape') {
+              window.__TAURI_INTERNALS__.invoke('hideWindow')
+            }
+          })
+      "#,
+      );
+
+      //
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;
       let quit_i = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
       let separator = &PredefinedMenuItem::separator(app).unwrap();
