@@ -6,7 +6,7 @@ mod commands;
 mod localStore;
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
-use tauri::tray::{MouseButton, TrayIconBuilder, TrayIconEvent};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{webview, AppHandle, LogicalSize, Manager, WindowEvent};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
@@ -108,17 +108,18 @@ pub fn run() {
             println!("未匹配 {:?}", event.id)
           }
         })
-        // .on_tray_icon_event(|tray, evt| match evt {
-        //   TrayIconEvent::Click {
-        //     button: MouseButton::Left,
-        //     button_state: MouseButtonState::Up,
-        //   } => {
-        //     println!("left click pressed and released");
-        //   }
-        //   _ => {
-        //     println!("{:?}", evt)
-        //   }
-        // })
+        .on_tray_icon_event(|tray, evt| match evt {
+          TrayIconEvent::Click {
+            position,
+            rect,
+            button: MouseButton::Right,
+            button_state: MouseButtonState::Up,
+            ..
+          } => {
+            dbg!(&position);
+          }
+          _ => {}
+        })
         .build(app)?;
       return Ok(());
     })

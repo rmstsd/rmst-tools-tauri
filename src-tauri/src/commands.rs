@@ -329,7 +329,7 @@ pub fn getProjectNamesTree(app: AppHandle) -> Value {
     notes: Some(vec![]),
   });
 
-  let projectPaths: Vec<String> = settingData.projectPaths.unwrap();
+  let projectPaths: Vec<String> = settingData.projectPaths.unwrap_or(vec![]);
 
   let nv: Vec<NamesTree> = projectPaths
     .into_iter()
