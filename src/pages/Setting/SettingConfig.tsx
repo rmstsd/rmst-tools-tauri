@@ -21,25 +21,27 @@ export default function Setting() {
 
   const importSetting = () => {
     invoke('importSetting').then(() => {
+      Message.success({ content: '操作成功', position: 'bottom' })
       getSettingData()
     })
   }
 
   const saveHandler = () => {
     const formValues = form.getFieldsValue()
-    invoke('saveSetting', { settingData: formValues })
+    invoke('saveSetting', { settingData: formValues }).then(() => {
+      Message.success({ content: '操作成功', position: 'bottom' })
+    })
   }
 
   const exportSetting = () => {
-    invoke('exportSetting')
-  }
-
-  const greet = () => {
-    invoke('greet')
+    invoke('exportSetting').then(() => {
+      Message.success({ content: '操作成功', position: 'bottom' })
+    })
   }
 
   const clearStore = () => {
     invoke('clearStore').then(() => {
+      Message.success({ content: '操作成功', position: 'bottom' })
       getSettingData()
     })
   }

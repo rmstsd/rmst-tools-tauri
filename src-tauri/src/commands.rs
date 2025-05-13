@@ -329,7 +329,7 @@ pub fn getProjectNamesTree(app: AppHandle) -> Value {
     notes: Some(vec![]),
   });
 
-  let projectPaths: Vec<String> = settingData.projectPaths.unwrap();
+  let projectPaths: Vec<String> = settingData.projectPaths.unwrap_or(vec![]);
 
   let nv: Vec<NamesTree> = projectPaths
     .into_iter()
@@ -354,7 +354,7 @@ pub fn getProjectNamesTree(app: AppHandle) -> Value {
         })
         .collect();
 
-      let nt: NamesTree = NamesTree { name, children };
+      let nt = NamesTree { name, children };
 
       return nt;
     })
@@ -423,6 +423,12 @@ pub async fn hideWindow(window: tauri::Window) -> Result<(), String> {
 #[tauri::command]
 pub async fn CopyAndPaste(app: AppHandle) -> Result<(), String> {
   app.clipboard().write_text("asdasdas".to_string()).unwrap();
+
+  let ww = app.get_webview_window("quickInput").unwrap();
+  ww.hide();
+
+  use std::{thread, time};
+  thread::sleep(time::Duration::from_millis(100));
 
   let mut enigo = Enigo::new(&Settings::default()).unwrap();
   // Paste

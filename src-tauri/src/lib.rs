@@ -6,7 +6,7 @@ mod commands;
 mod localStore;
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
-use tauri::tray::{MouseButton, TrayIconBuilder, TrayIconEvent};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{webview, AppHandle, LogicalSize, Manager, WindowEvent};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
@@ -24,7 +24,7 @@ pub fn run() {
     }))
     .plugin(
       tauri_plugin_global_shortcut::Builder::new()
-        .with_shortcuts(["ctrl+space"])
+        .with_shortcuts(["ctrl+space", "alt+b"])
         .unwrap()
         .with_handler(|app, shortcut, event| {
           if event.state == ShortcutState::Pressed {
@@ -42,6 +42,13 @@ pub fn run() {
                 openFolderWindows.show();
                 openFolderWindows.set_focus();
               }
+            }
+
+            if shortcut.matches(Modifiers::ALT, Code::KeyB) {
+              dbg!(&"shortcut");
+              let ww = app.get_webview_window("quickInput").unwrap();
+              ww.show();
+              ww.set_focus();
             }
           }
         })
@@ -108,17 +115,18 @@ pub fn run() {
             println!("未匹配 {:?}", event.id)
           }
         })
-        // .on_tray_icon_event(|tray, evt| match evt {
-        //   TrayIconEvent::Click {
-        //     button: MouseButton::Left,
-        //     button_state: MouseButtonState::Up,
-        //   } => {
-        //     println!("left click pressed and released");
-        //   }
-        //   _ => {
-        //     println!("{:?}", evt)
-        //   }
-        // })
+        .on_tray_icon_event(|tray, evt| match evt {
+          TrayIconEvent::Click {
+            position,
+            rect,
+            button: MouseButton::Right,
+            button_state: MouseButtonState::Up,
+            ..
+          } => {
+            dbg!(&position);
+          }
+          _ => {}
+        })
         .build(app)?;
       return Ok(());
     })
@@ -158,7 +166,7 @@ pub fn run() {
 fn crateTray() {}
 
 fn show_window(app: &AppHandle) {
-  let windows = app.webview_windows();
+  let windows: std::collections::HashMap<String, tauri::WebviewWindow> = app.webview_windows();
 
   windows
     .values()
