@@ -7,7 +7,7 @@ mod localStore;
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-use tauri::{webview, AppHandle, LogicalSize, Manager, Window, WindowEvent};
+use tauri::{webview, AppHandle, Emitter, LogicalSize, Manager, Window, WindowEvent};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
@@ -180,6 +180,9 @@ pub fn run() {
             // window.hide();
           }
         }
+
+        let app = window.app_handle();
+        app.emit_to("openFolder", "focusChanged", focused).unwrap();
       }
       _ => {}
     })

@@ -61,17 +61,14 @@ const OpenFolder = () => {
   useLayoutEffect(() => {
     getInitialData()
 
-    const onvisibilitychange = () => {
-      if (document.visibilityState == 'visible') {
-        getInitialData()
-      } else {
-        resetState()
-      }
-    }
+    const appWebview = getCurrentWebviewWindow()
+    const un = appWebview.listen<string>('focusChanged', event => {
+      resetState()
+      getInitialData()
+    })
 
-    document.addEventListener('visibilitychange', onvisibilitychange)
     return () => {
-      document.removeEventListener('visibilitychange', onvisibilitychange)
+      un.then(cb => cb())
     }
   }, [])
 
