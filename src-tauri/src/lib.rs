@@ -22,45 +22,6 @@ pub fn run() {
     .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
       let _ = show_window(app);
     }))
-    .plugin(
-      tauri_plugin_global_shortcut::Builder::new()
-        .with_shortcuts(["ctrl+space", "alt+b"])
-        .unwrap()
-        .with_handler(|app, shortcut, event| {
-          if event.state == ShortcutState::Pressed {
-            if shortcut.matches(Modifiers::CONTROL, Code::Space) {
-              let openFolderWindows = app.get_webview_window("openFolder").unwrap();
-
-              let isVisible = openFolderWindows.is_visible().unwrap_or_default();
-              if isVisible {
-                if openFolderWindows.is_focused().expect("is_focused msg") {
-                  openFolderWindows.hide();
-                } else {
-                  openFolderWindows.set_focus();
-                }
-              } else {
-                openFolderWindows.show();
-                openFolderWindows.set_focus();
-              }
-            }
-
-            if shortcut.matches(Modifiers::ALT, Code::KeyB) {
-              dbg!(&"shortcut");
-              let ww = app.get_webview_window("quickInput").unwrap();
-
-              if ww.is_visible().unwrap_or(false) {
-                ww.hide();
-              } else {
-                let pos = ww.cursor_position().unwrap();
-                ww.set_position(pos);
-                ww.show();
-                ww.set_focus();
-              }
-            }
-          }
-        })
-        .build(),
-    )
     .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![
@@ -137,6 +98,66 @@ pub fn run() {
           _ => {}
         })
         .build(app)?;
+
+      {
+        use tauri_plugin_global_shortcut::{
+          Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState,
+        };
+
+        let alt_space_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
+        let alt_v_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyV);
+
+        app.handle().plugin(
+          tauri_plugin_global_shortcut::Builder::new()
+            .with_handler(move |_app, shortcut, event| {
+              if shortcut == &alt_space_shortcut {
+                match event.state() {
+                  ShortcutState::Pressed => {
+                    let openFolderWindows = _app.get_webview_window("openFolder").unwrap();
+
+                    let isVisible = openFolderWindows.is_visible().unwrap_or_default();
+                    if isVisible {
+                      if openFolderWindows.is_focused().expect("is_focused msg") {
+                        openFolderWindows.hide();
+                      } else {
+                        openFolderWindows.set_focus();
+                      }
+                    } else {
+                      openFolderWindows.show();
+                      openFolderWindows.set_focus();
+                    }
+                  }
+                  ShortcutState::Released => {
+                    // println!("Ctrl-N Released!");
+                  }
+                }
+              }
+              if shortcut == &alt_v_shortcut {
+                match event.state() {
+                  ShortcutState::Pressed => {
+                    let ww = _app.get_webview_window("quickInput").unwrap();
+
+                    if ww.is_visible().unwrap_or(false) {
+                      ww.hide();
+                    } else {
+                      let pos = ww.cursor_position().unwrap();
+                      ww.set_position(pos);
+                      ww.show();
+                      ww.set_focus();
+                    }
+                  }
+                  ShortcutState::Released => {
+                    // println!("Ctrl-N Released!");
+                  }
+                }
+              }
+            })
+            .build(),
+        )?;
+
+        app.global_shortcut().register(alt_space_shortcut)?;
+        app.global_shortcut().register(alt_v_shortcut)?;
+      }
       return Ok(());
     })
     .on_window_event(|window, evt| match evt {
