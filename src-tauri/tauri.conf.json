@@ -36,7 +36,11 @@
         "visible": false,
         "width": 400,
         "height": 200,
-        "decorations": false
+        "decorations": false,
+        "alwaysOnTop": true,
+        "maximizable": false,
+        "minimizable": false,
+        "resizable": false
       }
     ],
     "security": {

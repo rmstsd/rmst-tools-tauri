@@ -421,8 +421,8 @@ pub async fn hideWindow(window: tauri::Window) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn CopyAndPaste(app: AppHandle) -> Result<(), String> {
-  app.clipboard().write_text("asdasdas".to_string()).unwrap();
+pub async fn CopyAndPaste(app: AppHandle, content: &str) -> Result<(), String> {
+  app.clipboard().write_text(content).unwrap();
 
   let ww = app.get_webview_window("quickInput").unwrap();
   ww.hide();
@@ -436,5 +436,28 @@ pub async fn CopyAndPaste(app: AppHandle) -> Result<(), String> {
   enigo.key(Key::Unicode('v'), Click);
   enigo.key(Key::Control, Release);
 
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn updateQuickInputWindowSize(
+  app: AppHandle,
+  size: LogicalSize<f64>,
+) -> Result<(), String> {
+  let ww = app.get_webview_window("quickInput").unwrap();
+
+  ww.set_size(Size::Logical(LogicalSize {
+    width: size.width,
+    height: size.height,
+  }));
+
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn hideQuickInputWindow(app: AppHandle) -> Result<(), String> {
+  let ww = app.get_webview_window("quickInput").unwrap();
+
+  ww.hide();
   Ok(())
 }

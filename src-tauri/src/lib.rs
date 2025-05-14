@@ -7,7 +7,7 @@ mod localStore;
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-use tauri::{webview, AppHandle, LogicalSize, Manager, WindowEvent};
+use tauri::{webview, AppHandle, LogicalSize, Manager, Window, WindowEvent};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
@@ -47,8 +47,15 @@ pub fn run() {
             if shortcut.matches(Modifiers::ALT, Code::KeyB) {
               dbg!(&"shortcut");
               let ww = app.get_webview_window("quickInput").unwrap();
-              ww.show();
-              ww.set_focus();
+
+              if ww.is_visible().unwrap_or(false) {
+                ww.hide();
+              } else {
+                let pos = ww.cursor_position().unwrap();
+                ww.set_position(pos);
+                ww.show();
+                ww.set_focus();
+              }
             }
           }
         })
@@ -73,7 +80,9 @@ pub fn run() {
       commands::setDirWindowSize,
       commands::page_loaded,
       commands::hideWindow,
-      commands::CopyAndPaste
+      commands::CopyAndPaste,
+      commands::updateQuickInputWindowSize,
+      commands::hideQuickInputWindow
     ])
     .setup(|app| {
       let ww = app.get_webview_window("openFolder").unwrap();

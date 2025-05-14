@@ -1,3 +1,5 @@
+import 'react'
+
 export type SettingData = {
   editorPaths: string[]
   cmdPath: string
@@ -13,4 +15,10 @@ export type AppBaseInfo = {
   node: string
   chrome: string
   electron: string
+}
+
+declare module 'react' {
+  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+    'data-tauri-drag-region'?: boolean
+  }
 }
