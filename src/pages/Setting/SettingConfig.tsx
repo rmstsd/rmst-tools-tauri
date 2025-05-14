@@ -1,8 +1,9 @@
 import { SettingData } from '../../type'
 import { invoke } from '@tauri-apps/api/core'
-import { Button, Divider, Form, Input, Link, Message, Switch, Tag, Typography } from '@arco-design/web-react'
+import { Button, Divider, Form, Input, Link, Message, Modal, Switch, Tag, Typography } from '@arco-design/web-react'
 import { IconDelete } from '@arco-design/web-react/icon'
 import { useEffect, useState } from 'react'
+import { check } from '@tauri-apps/plugin-updater'
 
 export default function Setting() {
   const [form] = Form.useForm<SettingData>()
@@ -46,6 +47,28 @@ export default function Setting() {
     })
   }
 
+  const checkUpdate = async () => {
+    try {
+      const info = await check()
+
+      if (info) {
+        console.log('有新版本', info)
+        Modal.confirm({
+          content: '下载并更新吗?',
+          onOk() {
+            info.downloadAndInstall(progress => {
+              console.log(progress)
+            })
+          }
+        })
+      } else {
+        console.log('没有新版本')
+      }
+    } catch (err: any) {
+      console.log(err)
+    }
+  }
+
   return (
     <div>
       <Form className="pr-[10%]" form={form} autoComplete="off">
@@ -67,6 +90,8 @@ export default function Setting() {
             <Button type="primary" status="danger" onClick={clearStore}>
               清空本地缓存
             </Button>
+
+            <Button onClick={checkUpdate}>检查更新</Button>
           </div>
         </Form.Item>
 
