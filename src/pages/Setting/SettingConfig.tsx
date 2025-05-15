@@ -4,6 +4,7 @@ import { Button, Divider, Form, Input, Link, Message, Modal, Switch, Tag, Typogr
 import { IconDelete } from '@arco-design/web-react/icon'
 import { useEffect, useState } from 'react'
 import { check } from '@tauri-apps/plugin-updater'
+import { relaunch } from '@tauri-apps/plugin-process'
 
 const format = (dateTime: string) => {
   return new Intl.DateTimeFormat('zh', {
@@ -97,7 +98,9 @@ export default function Setting() {
                   title: '下载完成',
                   content: '更新吗?',
                   onOk() {
-                    info.install()
+                    info.install().then(() => {
+                      relaunch()
+                    })
                   }
                 })
               }
@@ -106,6 +109,8 @@ export default function Setting() {
         })
       } else {
         console.log('没有新版本')
+
+        Message.info({ content: '没有新版本', position: 'bottom' })
       }
     } catch (err: any) {
       console.log(err)
