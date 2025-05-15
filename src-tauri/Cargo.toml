@@ -1,6 +1,6 @@
 [package]
 name = "rmst-tools-tauri"
-version = "0.1.0"
+version = "0.1.6"
 description = "A Tauri App"
 authors = ["人美声甜"]
 edition = "2021"
@@ -18,7 +18,12 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["tray-icon", "image-png", "image-ico"] }
+tauri = { version = "2", features = [
+  "tray-icon",
+  "image-png",
+  "image-ico",
+  "devtools",
+] }
 tauri-plugin-opener = "2"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
