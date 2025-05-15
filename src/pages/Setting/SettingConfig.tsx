@@ -5,10 +5,25 @@ import { IconDelete } from '@arco-design/web-react/icon'
 import { useEffect, useState } from 'react'
 import { check } from '@tauri-apps/plugin-updater'
 
+const format = (dateTime: string) => {
+  return new Intl.DateTimeFormat('zh', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  })
+    .format(new Date(dateTime))
+    .replace(/[/]/g, '-')
+}
+
 export default function Setting() {
   const [form] = Form.useForm<SettingData>()
 
   const [appInfo, setAppInfo] = useState({})
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     getSettingData()
@@ -55,16 +70,37 @@ export default function Setting() {
   }
 
   const checkUpdate = async () => {
+    setLoading(true)
     try {
       const info = await check()
 
       if (info) {
         console.log('有新版本', info)
         Modal.confirm({
-          content: '下载并更新吗?',
+          title: '发现新版本',
+          content: (
+            <div>
+              <Typography.Title heading={4}>下载吗?</Typography.Title>
+              <div className="text-xl">
+                <div>当前版本: {info.currentVersion}</div>
+                <div>新版本: {info.version}</div>
+                <div>发布时间: {format(info.date)}</div>
+              </div>
+            </div>
+          ),
           onOk() {
-            info.downloadAndInstall(progress => {
+            info.download(progress => {
               console.log(progress)
+
+              if (progress.event === 'Finished') {
+                Modal.confirm({
+                  title: '下载完成',
+                  content: '更新吗?',
+                  onOk() {
+                    info.install()
+                  }
+                })
+              }
             })
           }
         })
@@ -73,6 +109,8 @@ export default function Setting() {
       }
     } catch (err: any) {
       console.log(err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -107,7 +145,9 @@ export default function Setting() {
               清空本地缓存
             </Button>
 
-            <Button onClick={checkUpdate}>检查更新</Button>
+            <Button onClick={checkUpdate} loading={loading}>
+              检查更新
+            </Button>
           </div>
         </Form.Item>
 
