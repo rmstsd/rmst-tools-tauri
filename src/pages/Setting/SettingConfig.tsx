@@ -8,8 +8,15 @@ import { check } from '@tauri-apps/plugin-updater'
 export default function Setting() {
   const [form] = Form.useForm<SettingData>()
 
+  const [appInfo, setAppInfo] = useState({})
+
   useEffect(() => {
     getSettingData()
+
+    invoke('get_package_info').then(data => {
+      console.log(data)
+      setAppInfo(data)
+    })
   }, [])
 
   const getSettingData = () => {
@@ -72,6 +79,15 @@ export default function Setting() {
   return (
     <div>
       <Form className="pr-[10%]" form={form} autoComplete="off">
+        <div className="flex flex-wrap gap-3 my-2" style={{ fontSize: 16 }}>
+          {Object.keys(appInfo).map(k => (
+            <div key={k} className="flex gap-2">
+              <div>{k}:</div>
+              <Tag size="medium">{appInfo[k]}</Tag>
+            </div>
+          ))}
+        </div>
+
         <Form.Item label=" " className="sticky top-0 z-10 mt-2 bg-white border-b pb-2 pt-2">
           <div className="flex flex-wrap items-center gap-x-3">
             <h2>设置</h2>

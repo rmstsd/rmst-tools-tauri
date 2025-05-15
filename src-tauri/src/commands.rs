@@ -461,3 +461,36 @@ pub async fn hideQuickInputWindow(app: AppHandle) -> Result<(), String> {
   ww.hide();
   Ok(())
 }
+
+#[tauri::command]
+pub async fn get_package_info(app: AppHandle) -> Result<AppInfo, String> {
+  let pi = app.package_info();
+
+  dbg!(&pi);
+
+  let vvv = &pi.version;
+  let vec: Vec<String> = vec![&vvv.major, &vvv.minor, &vvv.patch]
+    .into_iter()
+    .map(|item| item.to_string())
+    .collect();
+  let version = vec.join(".");
+
+  let info = AppInfo {
+    name: pi.name.clone(),
+    version: version,
+    authors: pi.authors,
+    description: pi.description,
+    crate_name: pi.crate_name,
+  };
+
+  Ok(info)
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct AppInfo {
+  name: String,
+  version: String,
+  authors: &'static str,
+  description: &'static str,
+  crate_name: &'static str,
+}
