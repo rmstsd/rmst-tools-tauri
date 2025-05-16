@@ -3650,7 +3650,7 @@ dependencies = [
 
 [[package]]
 name = "rmst-tools-tauri"
-version = "0.1.17"
+version = "0.1.18"
 dependencies = [
  "enigo",
  "port-killer",
