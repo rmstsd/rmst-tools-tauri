@@ -91,9 +91,17 @@ export default function Setting() {
               </div>
             </div>
           ),
-          onOk() {
+          async onOk() {
             console.log('确定 下载')
             logInfo('确定 下载')
+
+            await info.downloadAndInstall(progress => {
+              console.log(progress)
+            })
+
+            relaunch()
+
+            return
 
             info.download(progress => {
               console.log('progress', progress)
@@ -102,7 +110,7 @@ export default function Setting() {
                 Modal.confirm({
                   title: '下载完成',
                   content: '更新吗?',
-                  onOk() {
+                  async onOk() {
                     logInfo('确定 更新')
 
                     info.install().then(() => {
@@ -142,13 +150,20 @@ export default function Setting() {
 
         <Form.Item label=" " className="sticky top-0 z-10 mt-2 bg-white border-b pb-2 pt-2">
           <div className="flex flex-wrap items-center gap-x-3">
-            <button
+            <Button
               onClick={() => {
                 logError('测试 log')
               }}
             >
               log test
-            </button>
+            </Button>
+            <Button
+              onClick={() => {
+                relaunch()
+              }}
+            >
+              relaunch
+            </Button>
             <h2>设置</h2>
             <Button type="primary" onClick={saveHandler}>
               保存

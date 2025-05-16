@@ -169,14 +169,8 @@ pub fn run() {
             .build(),
         )?;
 
-        app
-          .global_shortcut()
-          .register(alt_space_shortcut)
-          .expect("alt_space_shortcut 注册失败");
-        app
-          .global_shortcut()
-          .register(alt_v_shortcut)
-          .expect("alt_v_shortcut 注册失败");
+        app.global_shortcut().register(alt_space_shortcut);
+        app.global_shortcut().register(alt_v_shortcut);
       }
       return Ok(());
     })
