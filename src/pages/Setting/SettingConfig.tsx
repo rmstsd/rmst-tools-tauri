@@ -1,5 +1,6 @@
 import { SettingData } from '../../type'
 import { invoke } from '@tauri-apps/api/core'
+import { info as logInfo, error as logError } from '@tauri-apps/plugin-log'
 import { Button, Divider, Form, Input, Link, Message, Modal, Switch, Tag, Typography } from '@arco-design/web-react'
 import { IconDelete } from '@arco-design/web-react/icon'
 import { useEffect, useState } from 'react'
@@ -92,6 +93,7 @@ export default function Setting() {
           ),
           onOk() {
             console.log('确定 下载')
+            logInfo('确定 下载')
 
             info.download(progress => {
               console.log('progress', progress)
@@ -101,7 +103,11 @@ export default function Setting() {
                   title: '下载完成',
                   content: '更新吗?',
                   onOk() {
+                    logInfo('确定 更新')
+
                     info.install().then(() => {
+                      logInfo('更新完成')
+                      console.log('更新完成')
                       relaunch()
                     })
                   }
@@ -136,6 +142,13 @@ export default function Setting() {
 
         <Form.Item label=" " className="sticky top-0 z-10 mt-2 bg-white border-b pb-2 pt-2">
           <div className="flex flex-wrap items-center gap-x-3">
+            <button
+              onClick={() => {
+                logError('测试 log')
+              }}
+            >
+              log test
+            </button>
             <h2>设置</h2>
             <Button type="primary" onClick={saveHandler}>
               保存
