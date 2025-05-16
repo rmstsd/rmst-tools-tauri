@@ -81,17 +81,20 @@ export default function Setting() {
           title: '发现新版本',
           content: (
             <div>
-              <Typography.Title heading={4}>下载吗?</Typography.Title>
+              <Typography.Title heading={5}>下载吗?</Typography.Title>
+
               <div className="text-xl">
+                <Typography.Title heading={6}>新版本: {info.version}</Typography.Title>
                 <div>当前版本: {info.currentVersion}</div>
-                <div>新版本: {info.version}</div>
                 <div>发布时间: {format(info.date)}</div>
               </div>
             </div>
           ),
           onOk() {
+            console.log('确定 下载')
+
             info.download(progress => {
-              console.log(progress)
+              console.log('progress', progress)
 
               if (progress.event === 'Finished') {
                 Modal.confirm({
