@@ -183,7 +183,7 @@ pub fn openWin(app: AppHandle, url: String) {
   let ww: WebviewWindow =
     tauri::WebviewWindowBuilder::new(&app, label, tauri::WebviewUrl::App(url.clone().into()))
       .title("rmst-tools")
-      .inner_size(1000.0, 700.0)
+      .inner_size(1200.0, 800.0)
       .build()
       .expect("webview_window create error 啊");
 

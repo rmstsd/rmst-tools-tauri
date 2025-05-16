@@ -127,7 +127,7 @@ export default function Setting() {
       } else {
         console.log('没有新版本')
 
-        Message.info({ content: '没有新版本', position: 'bottom' })
+        Message.info({ content: '没有新版本' })
       }
     } catch (err: any) {
       console.log(err)
