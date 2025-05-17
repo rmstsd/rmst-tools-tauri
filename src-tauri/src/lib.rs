@@ -5,6 +5,7 @@
 mod commands;
 mod localStore;
 
+use log::{info, trace, warn};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{webview, AppHandle, Emitter, LogicalSize, Manager, Window, WindowEvent};
@@ -12,6 +13,7 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 use tauri_plugin_log::{Target, TargetKind, TimezoneStrategy};
+use tauri_plugin_updater::UpdaterExt;
 use tokio::time::{sleep, Duration};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -61,6 +63,12 @@ pub fn run() {
       commands::get_package_info
     ])
     .setup(|app| {
+      info!("App setup 启动");
+      let handle = app.handle().clone();
+      tauri::async_runtime::spawn(async move {
+        update(handle).await.unwrap();
+      });
+
       let ww = app.get_webview_window("openFolder").unwrap();
       ww.eval(
         r#"
@@ -222,4 +230,31 @@ fn show_window(app: &AppHandle) {
     .expect("Sorry, no window found")
     .set_focus()
     .expect("Can't Bring Window to Focus");
+}
+
+async fn update(app: tauri::AppHandle) -> tauri_plugin_updater::Result<()> {
+  if let Some(update) = app.updater()?.check().await? {
+    let mut downloaded = 0;
+
+    info!("rust -> 下载并安装");
+    // alternatively we could also call update.download() and update.install() separately
+    update
+      .download_and_install(
+        |chunk_length, content_length| {
+          downloaded += chunk_length;
+          println!("downloaded {downloaded} from {content_length:?}");
+        },
+        || {
+          println!("download finished");
+          info!("rust -> download finished");
+        },
+      )
+      .await?;
+
+    println!("update installed");
+    info!("rust -> update installed");
+    app.restart();
+  }
+
+  Ok(())
 }

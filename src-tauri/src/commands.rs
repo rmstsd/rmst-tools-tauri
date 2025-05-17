@@ -494,3 +494,8 @@ pub struct AppInfo {
   description: &'static str,
   crate_name: &'static str,
 }
+
+// #[tauri::command]
+// pub async fn checkUpdateRust() -> Result<(), String> {
+//   Ok(())
+// }

@@ -151,6 +151,10 @@ export default function Setting() {
     }
   }
 
+  const checkUpdateRust = async () => {
+    invoke('checkUpdateRust').then(() => {})
+  }
+
   return (
     <div>
       <Form className="pr-[10%]" form={form} autoComplete="off">
@@ -197,7 +201,11 @@ export default function Setting() {
             </Button>
 
             <Button onClick={checkUpdate} loading={loading}>
-              检查更新
+              检查更新 js
+            </Button>
+
+            <Button onClick={checkUpdateRust} loading={loading}>
+              检查更新 rust
             </Button>
           </div>
         </Form.Item>

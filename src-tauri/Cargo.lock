@@ -3650,9 +3650,10 @@ dependencies = [
 
 [[package]]
 name = "rmst-tools-tauri"
-version = "0.1.22"
+version = "0.1.1"
 dependencies = [
  "enigo",
+ "log",
  "port-killer",
  "rand 0.9.0",
  "serde",
