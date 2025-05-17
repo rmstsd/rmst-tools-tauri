@@ -74,10 +74,10 @@ export default function Setting() {
   const checkUpdate = async () => {
     setLoading(true)
     try {
-      const info = await check()
+      const update = await check()
 
-      if (info) {
-        console.log('有新版本', info)
+      if (update) {
+        console.log('有新版本', update)
         Modal.confirm({
           title: '发现新版本',
           content: (
@@ -85,9 +85,9 @@ export default function Setting() {
               <Typography.Title heading={5}>下载吗?</Typography.Title>
 
               <div className="text-xl">
-                <Typography.Title heading={6}>新版本: {info.version}</Typography.Title>
-                <div>当前版本: {info.currentVersion}</div>
-                <div>发布时间: {format(info.date)}</div>
+                <Typography.Title heading={6}>新版本: {update.version}</Typography.Title>
+                <div>当前版本: {update.currentVersion}</div>
+                <div>发布时间: {format(update.date)}</div>
               </div>
             </div>
           ),
@@ -95,33 +95,48 @@ export default function Setting() {
             console.log('确定 下载')
             logInfo('确定 下载')
 
-            await info.downloadAndInstall(progress => {
-              console.log(progress)
+            await update.downloadAndInstall(event => {
+              switch (event.event) {
+                case 'Started':
+                  logInfo('started downloading')
+                  console.log(`started downloading ${event.data.contentLength} bytes`)
+                  break
+                case 'Progress':
+                  logInfo('downloaded ing')
+                  console.log(`downloaded ${event.data} `)
+                  break
+                case 'Finished':
+                  logInfo('download finished')
+                  console.log('download finished')
+                  break
+              }
             })
 
-            relaunch()
+            console.log('update installed')
+            logInfo('update installed')
+            await relaunch()
 
             return
 
-            info.download(progress => {
-              console.log('progress', progress)
+            // info.download(progress => {
+            //   console.log('progress', progress)
 
-              if (progress.event === 'Finished') {
-                Modal.confirm({
-                  title: '下载完成',
-                  content: '更新吗?',
-                  async onOk() {
-                    logInfo('确定 更新')
+            //   if (progress.event === 'Finished') {
+            //     Modal.confirm({
+            //       title: '下载完成',
+            //       content: '更新吗?',
+            //       async onOk() {
+            //         logInfo('确定 更新')
 
-                    info.install().then(() => {
-                      logInfo('更新完成')
-                      console.log('更新完成')
-                      relaunch()
-                    })
-                  }
-                })
-              }
-            })
+            //         info.install().then(() => {
+            //           logInfo('更新完成')
+            //           console.log('更新完成')
+            //           relaunch()
+            //         })
+            //       }
+            //     })
+            //   }
+            // })
           }
         })
       } else {
