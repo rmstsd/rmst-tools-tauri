@@ -151,8 +151,32 @@ export default function Setting() {
     }
   }
 
+  interface Update {
+    needUpdate: boolean
+    current_version: string
+    version: string
+  }
+
   const checkUpdateRust = async () => {
-    invoke('checkUpdateRust').then(() => {})
+    invoke<Update>('checkUpdateRust').then(update => {
+      if (update.needUpdate) {
+        Modal.confirm({
+          title: '发现新版本',
+          content: (
+            <div>
+              <div className="text-xl">
+                <Typography.Title heading={5}>新版本: {update.version}</Typography.Title>
+                <div>当前版本: {update.current_version}</div>
+                {/* <div>发布时间: {format(update.date)}</div> */}
+              </div>
+            </div>
+          ),
+          onOk: () => {
+            invoke('downloadAndInstall')
+          }
+        })
+      }
+    })
   }
 
   return (
@@ -168,7 +192,7 @@ export default function Setting() {
         </div>
 
         <Form.Item label=" " className="sticky top-0 z-10 mt-2 bg-white border-b pb-2 pt-2">
-          <div className="flex flex-wrap items-center gap-x-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Button
               onClick={() => {
                 logError('测试 log')

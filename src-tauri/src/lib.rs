@@ -60,14 +60,16 @@ pub fn run() {
       commands::CopyAndPaste,
       commands::updateQuickInputWindowSize,
       commands::hideQuickInputWindow,
-      commands::get_package_info
+      commands::get_package_info,
+      commands::checkUpdateRust,
+      commands::downloadAndInstall
     ])
     .setup(|app| {
       info!("App setup 启动");
-      let handle = app.handle().clone();
-      tauri::async_runtime::spawn(async move {
-        update(handle).await.unwrap();
-      });
+      // let handle = app.handle().clone();
+      // tauri::async_runtime::spawn(async move {
+      //   update(handle).await.unwrap();
+      // });
 
       let ww = app.get_webview_window("openFolder").unwrap();
       ww.eval(

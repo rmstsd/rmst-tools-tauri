@@ -3,6 +3,7 @@ use enigo::{
   Direction::{Click, Press, Release},
   Enigo, Key, Keyboard, Mouse, Settings,
 };
+use log::info;
 use port_killer::kill;
 use rand::random;
 use serde::de::value;
@@ -495,7 +496,89 @@ pub struct AppInfo {
   crate_name: &'static str,
 }
 
-// #[tauri::command]
-// pub async fn checkUpdateRust() -> Result<(), String> {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UpdateInfo {
+  needUpdate: bool,
+  current_version: String,
+  version: String,
+}
+
+static mut updatePlay: Option<Update> = None;
+
+use tauri_plugin_updater::{Update, UpdaterExt};
+#[tauri::command]
+pub async fn checkUpdateRust(app: tauri::AppHandle) -> tauri_plugin_updater::Result<UpdateInfo> {
+  if let Some(update) = app.app_handle().updater()?.check().await? {
+    unsafe {
+      updatePlay = Some(update.clone());
+    };
+
+    let updateInfo = UpdateInfo {
+      needUpdate: true,
+      current_version: update.current_version,
+      version: update.version,
+    };
+    return Ok(updateInfo);
+  }
+
+  Ok(UpdateInfo {
+    needUpdate: false,
+    current_version: "".to_string(),
+    version: "".to_string(),
+  })
+}
+#[tauri::command]
+pub async fn downloadAndInstall(app: AppHandle) {
+  unsafe {
+    match updatePlay.as_ref() {
+      Some(update) => {
+        info!("开始下载 update");
+        // Use `update` as a reference here
+        update
+          .download_and_install(
+            |chunk_length, content_length| {
+              // downloaded += chunk_length;
+              // println!("downloaded {downloaded} from {content_length:?}");
+            },
+            || {
+              println!("download finished");
+              info!("rust -> download finished");
+            },
+          )
+          .await;
+
+        println!("update installed");
+        info!("rust -> update installed");
+        app.restart();
+      }
+      None => {}
+    }
+  }
+}
+
+// async fn update(app: tauri::AppHandle) -> tauri_plugin_updater::Result<()> {
+//   if let Some(update) = app.updater()?.check().await? {
+//     let mut downloaded = 0;
+
+//     info!("rust -> 下载并安装");
+//     // alternatively we could also call update.download() and update.install() separately
+//     update
+//       .download_and_install(
+//         |chunk_length, content_length| {
+//           downloaded += chunk_length;
+//           println!("downloaded {downloaded} from {content_length:?}");
+//         },
+//         || {
+//           println!("download finished");
+//           info!("rust -> download finished");
+//         },
+//       )
+//       .await?;
+
+//     println!("update installed");
+//     info!("rust -> update installed");
+//     app.restart();
+//   }
+
 //   Ok(())
 // }
