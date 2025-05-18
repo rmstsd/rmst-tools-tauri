@@ -6,7 +6,7 @@ use enigo::{
 use log::info;
 use port_killer::kill;
 use rand::random;
-use serde::de::value;
+use serde::de::{self, value};
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::from_reader;
@@ -15,7 +15,6 @@ use serde_json::json;
 use serde_json::to_string;
 use serde_json::to_value;
 use serde_json::Value;
-use std::fs;
 use std::fs::metadata;
 use std::fs::read_dir;
 use std::fs::File;
@@ -24,6 +23,7 @@ use std::io::BufReader;
 use std::io::Read;
 use std::path::Path;
 use std::vec;
+use std::{fs, path::PathBuf};
 use tauri::image;
 use tauri::image::Image;
 use tauri::webview::PageLoadEvent;
@@ -43,6 +43,8 @@ static Store_Key: &str = "store.json";
 
 static Setting_Key: &str = "setting";
 static HistoryOpenedUrls_Key: &str = "historyOpenedUrls";
+
+static Commands_Key: &str = "commands";
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -111,7 +113,11 @@ pub fn exportSetting(app: AppHandle) {
   let store = app.store(Store_Key).unwrap();
   let ans = store.get(Setting_Key);
 
-  fs::write(file_path.to_string(), "aa").expect("Unable to read file");
+  dbg!(&ans);
+
+  let st = to_string(&ans.unwrap_or(json!({})));
+
+  fs::write(file_path.to_string(), st.unwrap_or_default()).expect("Unable to read file");
 }
 
 #[tauri::command]
@@ -582,3 +588,99 @@ pub async fn downloadAndInstall(app: AppHandle) {
 
 //   Ok(())
 // }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CommandItem {
+  label: String,
+  cmd: String,        // node
+  arg: String,        // index.js
+  currentDir: String, // E:/rmst-sd
+}
+
+#[tauri::command]
+pub async fn saveCommands(
+  app: tauri::AppHandle,
+  commands: Option<Vec<CommandItem>>,
+) -> Result<(), String> {
+  let store = app.store(Store_Key).unwrap();
+
+  let value = to_value(commands).unwrap_or(json!([]));
+
+  store.set(Commands_Key, value);
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn getCommands(app: tauri::AppHandle) -> Result<Vec<CommandItem>, String> {
+  let store = app.store(Store_Key).unwrap();
+
+  let value = store.get(Commands_Key).unwrap_or(json!([]));
+
+  let commands: Vec<CommandItem> = from_value(value).unwrap_or_default();
+
+  Ok(commands)
+}
+
+#[tauri::command]
+pub async fn execCommand(app: tauri::AppHandle, label: String) -> Result<(), String> {
+  let store = app.store(Store_Key).unwrap();
+
+  let value = store.get(Commands_Key).unwrap_or(json!([]));
+
+  let commands: Vec<CommandItem> = from_value(value).unwrap_or_default();
+
+  let cmdItem = commands.iter().find(|item| item.label == label);
+
+  match cmdItem {
+    Some(cmdItem) => {
+      let bb = CommandItem {
+        label: cmdItem.label.clone(),
+        cmd: cmdItem.cmd.clone(),
+        arg: cmdItem.arg.clone(),
+        currentDir: cmdItem.currentDir.clone(),
+      };
+      let result = execCommandItem(bb);
+
+      dbg!(&result);
+      return result;
+    }
+    None => {}
+  }
+
+  Ok(())
+}
+
+fn execCommandItem(commandItem: CommandItem) -> Result<(), String> {
+  // 指定目标目录（可替换为实际路径）
+  let target_dir = PathBuf::from(commandItem.currentDir);
+
+  // 构建命令：node sc.js
+  let mut cmd = Command::new(commandItem.cmd);
+  let args: Vec<&str> = commandItem.arg.split_whitespace().collect();
+
+  for arg in args {
+    cmd.arg(arg);
+  }
+
+  cmd.current_dir(target_dir); // 设置工作目录
+
+  // 执行命令并处理输出
+  match cmd.status() {
+    Ok(status) => {
+      if status.success() {
+        println!("命令执行成功");
+
+        Ok(())
+      } else {
+        let str = format!("命令执行失败，退出码：{}", status.code().unwrap_or(-1));
+        dbg!(&str);
+
+        Err(str)
+      }
+    }
+    Err(e) => {
+      eprintln!("启动进程失败：{}", e);
+      Err("启动进程失败：".to_string())
+    }
+  }
+}

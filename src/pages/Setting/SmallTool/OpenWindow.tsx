@@ -29,7 +29,7 @@ const OpenWindow = () => {
 
   return (
     <Form form={form} initialValues={{}}>
-      <Form.Item label="opened url" field="url" rules={[{ required: true, type: 'url' }]}>
+      <Form.Item label="opened url" field="url" rules={[{ required: true }]}>
         <Input placeholder="http://www.example.com" />
       </Form.Item>
       <Form.Item label=" ">

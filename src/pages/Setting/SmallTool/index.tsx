@@ -3,6 +3,7 @@ import { Divider } from '@arco-design/web-react'
 import KillPortTool from './KillPortTool'
 import OpenWindow from './OpenWindow'
 import GitSetting from './GitSetting'
+import ExecCommand from './ExecCommand'
 
 export default function SmallTool() {
   return (
@@ -14,6 +15,8 @@ export default function SmallTool() {
       <OpenWindow />
 
       <Divider />
+
+      <ExecCommand />
 
       {/* <GitSetting /> */}
     </div>

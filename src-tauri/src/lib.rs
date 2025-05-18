@@ -62,7 +62,10 @@ pub fn run() {
       commands::hideQuickInputWindow,
       commands::get_package_info,
       commands::checkUpdateRust,
-      commands::downloadAndInstall
+      commands::downloadAndInstall,
+      commands::saveCommands,
+      commands::getCommands,
+      commands::execCommand
     ])
     .setup(|app| {
       info!("App setup 启动");
