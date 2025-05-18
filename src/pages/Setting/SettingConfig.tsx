@@ -82,15 +82,12 @@ export default function Setting() {
           title: '发现新版本',
           content: (
             <div>
-              <Typography.Title heading={5}>下载吗?</Typography.Title>
-
-              <div className="text-xl">
-                <Typography.Title heading={6}>新版本: {update.version}</Typography.Title>
-                <div>当前版本: {update.currentVersion}</div>
-                <div>发布时间: {format(update.date)}</div>
-              </div>
+              <Typography.Title heading={5}>新版本: {update.version}</Typography.Title>
+              <Typography.Paragraph>当前版本: {update.currentVersion}</Typography.Paragraph>
+              <Typography.Paragraph>发布时间: {format(update.date)}</Typography.Paragraph>
             </div>
           ),
+          okText: '下载-更新-重启',
           async onOk() {
             console.log('确定 下载')
             logInfo('确定 下载')
@@ -193,21 +190,7 @@ export default function Setting() {
 
         <Form.Item label=" " className="sticky top-0 z-10 mt-2 bg-white border-b pb-2 pt-2">
           <div className="flex flex-wrap items-center gap-3">
-            <Button
-              onClick={() => {
-                logError('测试 log')
-              }}
-            >
-              log test
-            </Button>
-            <Button
-              onClick={() => {
-                relaunch()
-              }}
-            >
-              relaunch
-            </Button>
-            <h2>设置</h2>
+            <h2 onClick={() => logError('测试 log')}>设置</h2>
             <Button type="primary" onClick={saveHandler}>
               保存
             </Button>
@@ -225,11 +208,7 @@ export default function Setting() {
             </Button>
 
             <Button onClick={checkUpdate} loading={loading}>
-              检查更新 js
-            </Button>
-
-            <Button onClick={checkUpdateRust} loading={loading}>
-              检查更新 rust
+              检查更新
             </Button>
           </div>
         </Form.Item>
