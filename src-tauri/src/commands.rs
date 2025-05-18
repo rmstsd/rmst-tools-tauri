@@ -46,15 +46,9 @@ static HistoryOpenedUrls_Key: &str = "historyOpenedUrls";
 
 static Commands_Key: &str = "commands";
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-pub fn greet(name: &str) -> String {
-  println!("{name:?}");
-  format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tauri::command]
 pub fn importSetting(app: AppHandle) {
+  dbg!(&7785);
   let file_path = app.dialog().file().blocking_pick_file();
 
   match file_path {

@@ -4,7 +4,7 @@
   "version": "0.1.25",
   "type": "module",
   "scripts": {
-    "dev": "tauri dev",
+    "dev": "tauri dev -- --profile fast-dev",
     "build": "tauri build",
     "build-with-env": "tsx ./scripts/build.ts",
     "dev-web": "vite",

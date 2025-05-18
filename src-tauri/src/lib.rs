@@ -41,7 +41,6 @@ pub fn run() {
     .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![
-      commands::greet,
       commands::openWin,
       commands::importSetting,
       commands::exportSetting,
@@ -68,7 +67,7 @@ pub fn run() {
       commands::execCommand
     ])
     .setup(|app| {
-      info!("App setup 启动");
+      info!("App setup 启动了");
       // let handle = app.handle().clone();
       // tauri::async_runtime::spawn(async move {
       //   update(handle).await.unwrap();
