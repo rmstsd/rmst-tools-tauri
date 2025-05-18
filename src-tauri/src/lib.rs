@@ -35,9 +35,13 @@ pub fn run() {
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_store::Builder::new().build())
-    // .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-    //   // let _ = show_window(app);
-    // }))
+    .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+      let ww = app.get_webview_window("setting");
+      if let Some(ww) = ww {
+        ww.show();
+        ww.set_focus();
+      }
+    }))
     .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![
@@ -221,19 +225,6 @@ pub fn run() {
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
-}
-
-fn crateTray() {}
-
-fn show_window(app: &AppHandle) {
-  let windows: std::collections::HashMap<String, tauri::WebviewWindow> = app.webview_windows();
-
-  windows
-    .values()
-    .next()
-    .expect("Sorry, no window found")
-    .set_focus()
-    .expect("Can't Bring Window to Focus");
 }
 
 async fn update(app: tauri::AppHandle) -> tauri_plugin_updater::Result<()> {
