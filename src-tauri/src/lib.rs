@@ -90,10 +90,10 @@ pub fn run() {
 
       //
       let m2 = MenuItem::with_id(app, "setting", "设置", true, None::<&str>)?;
+      let restart = MenuItem::with_id(app, "restart", "重启", true, None::<&str>)?;
       let quit_i = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
       let separator = &PredefinedMenuItem::separator(app).unwrap();
-
-      let menu = Menu::with_items(app, &[&m2, separator, &quit_i])?;
+      let menu = Menu::with_items(app, &[&m2, separator, &restart, &quit_i])?;
       let tray = TrayIconBuilder::new()
         .menu(&menu)
         .show_menu_on_left_click(false)
@@ -111,6 +111,9 @@ pub fn run() {
 
             settingWindow.show();
             settingWindow.set_focus();
+          }
+          "restart" => {
+            app.restart();
           }
           _ => {
             println!("未匹配 {:?}", event.id)
