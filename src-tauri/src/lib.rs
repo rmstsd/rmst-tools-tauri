@@ -23,7 +23,7 @@ pub fn run() {
   tauri::Builder::default()
     .plugin(tauri_plugin_autostart::init(
       MacosLauncher::LaunchAgent,
-      Some(vec!["--flag1", "--flag2"]),
+      Some(vec![]),
     ))
     .plugin(
       tauri_plugin_log::Builder::new()
