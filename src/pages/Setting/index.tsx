@@ -3,12 +3,23 @@ import { useEffect, useState } from 'react'
 import SettingConfig from './SettingConfig'
 import SmallTool from './SmallTool'
 import QrCode from './QrCode'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 
 export default function SettingPage() {
   const [activeKey, setActiveKey] = useState(localStorage.getItem('activeKey') || '1')
   const [qrCodeValue, setQrCodeValue] = useState('rmst')
 
-  useEffect(() => {}, [])
+  useEffect(() => {
+    const appWebview = getCurrentWebviewWindow()
+    const un = appWebview.listen<string>('showQrCode', ({ payload }) => {
+      setActiveKey('3')
+      setQrCodeValue(payload ?? '')
+    })
+
+    return () => {
+      un.then(cb => cb())
+    }
+  }, [])
 
   return (
     <Tabs

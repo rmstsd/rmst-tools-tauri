@@ -3,18 +3,9 @@ import { Divider, Input, Message, Radio } from '@arco-design/web-react'
 import path from 'path-browserify'
 import clsx from 'clsx'
 
-// import { defaultList } from '../utils'
 import ResizeObserver from 'rc-resize-observer'
 import { SettingData } from '../type'
 import { invoke } from '@tauri-apps/api/core'
-// import { getSetting, openExternal } from '@renderer/ipc/common'
-// import {
-//   getProjectNamesTree,
-//   hideDirWindow,
-//   openWithTerminal,
-//   openWithVscode,
-//   setDirWindowSize
-// } from '@renderer/ipc/openDir'
 
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 

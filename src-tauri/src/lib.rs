@@ -159,6 +159,7 @@ pub fn run() {
 
         let alt_space_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
         let alt_v_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyV);
+        let alt_r_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyR);
 
         app.handle().plugin(
           tauri_plugin_global_shortcut::Builder::new()
@@ -204,12 +205,32 @@ pub fn run() {
                   }
                 }
               }
+              if shortcut == &alt_r_shortcut {
+                dbg!(&"alt + r");
+                match event.state() {
+                  ShortcutState::Pressed => {
+                    let ww = _app.get_webview_window("setting").unwrap();
+                    ww.unminimize();
+                    ww.show();
+                    ww.set_focus();
+
+                    let clipboard_text = _app.clipboard().read_text().unwrap_or_default();
+                    let text = clipboard_text.trim().to_string();
+
+                    _app.emit_to("setting", "showQrCode", text);
+                  }
+                  ShortcutState::Released => {
+                    // println!("Ctrl-N Released!");
+                  }
+                }
+              }
             })
             .build(),
         )?;
 
         app.global_shortcut().register(alt_space_shortcut);
         app.global_shortcut().register(alt_v_shortcut);
+        app.global_shortcut().register(alt_r_shortcut);
       }
       return Ok(());
     })
