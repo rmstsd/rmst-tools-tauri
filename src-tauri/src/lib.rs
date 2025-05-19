@@ -9,6 +9,8 @@ use log::{info, trace, warn};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{webview, AppHandle, Emitter, LogicalSize, Manager, Window, WindowEvent};
+use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
@@ -19,6 +21,10 @@ use tokio::time::{sleep, Duration};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    .plugin(tauri_plugin_autostart::init(
+      MacosLauncher::LaunchAgent,
+      Some(vec!["--flag1", "--flag2"]),
+    ))
     .plugin(
       tauri_plugin_log::Builder::new()
         .timezone_strategy(TimezoneStrategy::UseLocal)
@@ -76,6 +82,17 @@ pub fn run() {
       // tauri::async_runtime::spawn(async move {
       //   update(handle).await.unwrap();
       // });
+
+      // 获取自动启动管理器
+      let autostart_manager = app.autolaunch();
+      let isEnabled = autostart_manager.is_enabled();
+
+      dbg!(&isEnabled);
+      if (isEnabled.unwrap_or_default()) {
+        // autostart_manager.disable();
+      } else {
+        autostart_manager.enable();
+      }
 
       let ww = app.get_webview_window("openFolder").unwrap();
       ww.eval(
