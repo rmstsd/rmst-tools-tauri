@@ -183,7 +183,7 @@ export default function Setting() {
           {Object.keys(appInfo).map(k => (
             <div key={k} className="flex gap-2">
               <div>{k}:</div>
-              <Tag size="medium">{appInfo[k]}</Tag>
+              <Tag size="medium">{String(appInfo[k])}</Tag>
             </div>
           ))}
         </div>

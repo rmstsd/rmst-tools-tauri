@@ -130,7 +130,9 @@ pub fn run() {
             settingWindow.set_focus();
           }
           "restart" => {
-            app.restart();
+            let app_handle = app.app_handle();
+            tauri::process::restart(&app_handle.env());
+            // app.restart();
           }
           _ => {
             println!("未匹配 {:?}", event.id)
