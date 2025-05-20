@@ -210,6 +210,9 @@ export default function Setting() {
             <Button onClick={checkUpdate} loading={loading}>
               检查更新
             </Button>
+            <Button onClick={checkUpdateRust} loading={loading}>
+              检查更新 rs
+            </Button>
           </div>
         </Form.Item>
 
