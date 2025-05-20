@@ -33,7 +33,7 @@ importers:
         specifier: ~2
         version: 2.2.1
       '@tauri-apps/plugin-process':
-        specifier: ^2.2.0
+        specifier: ~2
         version: 2.2.1
       '@tauri-apps/plugin-shell':
         specifier: 2.2.0
@@ -42,8 +42,8 @@ importers:
         specifier: ~2
         version: 2.2.0
       '@tauri-apps/plugin-updater':
-        specifier: 2.3.0
-        version: 2.3.0
+        specifier: ~2.7.1
+        version: 2.7.1
       ahooks:
         specifier: ^3.8.4
         version: 3.8.4(react@18.3.1)
@@ -59,9 +59,6 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
-      release-it:
-        specifier: 19.0.2
-        version: 19.0.2(@types/node@22.15.19)
       tailwindcss:
         specifier: '3'
         version: 3.4.17
@@ -102,6 +99,9 @@ importers:
       rc-resize-observer:
         specifier: ^1.4.0
         version: 1.4.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      release-it:
+        specifier: 19.0.2
+        version: 19.0.2(@types/node@22.15.19)
       sharp:
         specifier: ^0.33.5
         version: 0.33.5
@@ -1041,8 +1041,8 @@ packages:
   '@tauri-apps/plugin-store@2.2.0':
     resolution: {integrity: sha512-hJTRtuJis4w5fW1dkcgftsYxKXK0+DbAqurZ3CURHG5WkAyyZgbxpeYctw12bbzF9ZbZREXZklPq8mocCC3Sgg==}
 
-  '@tauri-apps/plugin-updater@2.3.0':
-    resolution: {integrity: sha512-qdzyZEUN69FZQ/nRx51fBub10tT6wffJl3DLVo9q922Gvw8Wk++rZhoD9eethPlZYbog/7RGgT8JkrfLh5BKAg==}
+  '@tauri-apps/plugin-updater@2.7.1':
+    resolution: {integrity: sha512-1OPqEY/z7NDVSeTEMIhD2ss/vXWdpfZ5Th2Mk0KtPR/RA6FKuOTDGZQhxoyYBk0pcZJ+nNZUbl/IujDCLBApjA==}
 
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
@@ -3133,7 +3133,7 @@ snapshots:
     dependencies:
       '@tauri-apps/api': 2.5.0
 
-  '@tauri-apps/plugin-updater@2.3.0':
+  '@tauri-apps/plugin-updater@2.7.1':
     dependencies:
       '@tauri-apps/api': 2.5.0
 

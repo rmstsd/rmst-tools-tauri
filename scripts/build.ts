@@ -1,7 +1,7 @@
 import { execSync } from 'child_process'
 
 // cargo tauri build --debug
-execSync('pnpm tauri build --debug', {
+execSync('pnpm tauri build', {
   stdio: 'inherit',
   env: {
     ...process.env,
