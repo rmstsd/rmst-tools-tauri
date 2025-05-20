@@ -10,7 +10,7 @@
     "dev-web": "vite",
     "build-web": "vite build",
     "preview": "vite preview",
-    "release-it": "release-it patch --ci"
+    "release": "release-it patch --ci"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",
