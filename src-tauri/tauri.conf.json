@@ -80,7 +80,7 @@
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ1QzQxNTc0NUNDQzE0NzkKUldSNUZNeGNkQlhFUmZiUXAyakd1VVl5WENwZHFVMVZ1d2NCbU81OUNyRHdTc3oxV3hudnN2K2cK",
       "endpoints": ["https://github.com/rmstsd/rmst-tools-tauri/releases/latest/download/latest.json"],
       "windows": {
-        "installMode": "basicUi"
+        "installMode": "passive"
       }
     }
   }
