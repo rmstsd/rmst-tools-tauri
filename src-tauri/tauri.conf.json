@@ -57,7 +57,8 @@
     "windows": {
       "nsis": {
         "displayLanguageSelector": true,
-        "languages": ["SimpChinese", "English"]
+        "languages": ["SimpChinese", "English"],
+        "installerIcon": "icons/icon.ico"
       }
     }
   },
