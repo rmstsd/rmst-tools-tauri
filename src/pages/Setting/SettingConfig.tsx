@@ -148,6 +148,35 @@ export default function Setting() {
     }
   }
 
+  const checkUpdate_v2 = async () => {
+    const update = await check()
+    console.log('update', update)
+    if (update) {
+      console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`)
+      let downloaded = 0
+      let contentLength = 0
+      // alternatively we could also call update.download() and update.install() separately
+      await update.downloadAndInstall(event => {
+        switch (event.event) {
+          case 'Started':
+            contentLength = event.data.contentLength
+            console.log(`started downloading ${event.data.contentLength} bytes`)
+            break
+          case 'Progress':
+            downloaded += event.data.chunkLength
+            console.log(`downloaded ${downloaded} from ${contentLength}`)
+            break
+          case 'Finished':
+            console.log('download finished')
+            break
+        }
+      })
+
+      console.log('update installed')
+      await relaunch()
+    }
+  }
+
   interface Update {
     needUpdate: boolean
     current_version: string
@@ -210,8 +239,14 @@ export default function Setting() {
             <Button onClick={checkUpdate} loading={loading}>
               检查更新
             </Button>
+            <Button onClick={checkUpdate_v2} loading={loading}>
+              检查更新 v2
+            </Button>
             <Button onClick={checkUpdateRust} loading={loading}>
               检查更新 rs
+            </Button>
+            <Button onClick={() => invoke('check_update')} loading={loading}>
+              检查更新 rs v2
             </Button>
           </div>
         </Form.Item>

@@ -8,7 +8,6 @@
     "beforeBuildCommand": "pnpm build-web",
     "frontendDist": "../dist"
   },
-
   "app": {
     "windows": [
       {
@@ -48,9 +47,6 @@
     }
   },
   "bundle": {
-    "publisher": "rmstsd",
-    "longDescription": "rmst-tools",
-    "shortDescription": "rmst-tools",
     "resources": {
       "icons2/*": "icons2/"
     },
@@ -59,24 +55,14 @@
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
     "createUpdaterArtifacts": true,
     "windows": {
-      "certificateThumbprint": null,
-      "digestAlgorithm": "sha256",
-      "timestampUrl": "",
-      "webviewInstallMode": {
-        "type": "embedBootstrapper",
-        "silent": true
-      },
       "nsis": {
         "displayLanguageSelector": true,
-        "languages": ["SimpChinese", "English"],
-        "installMode": "perMachine",
-        "installerIcon": "icons/icon.ico"
+        "languages": ["SimpChinese", "English"]
       }
     }
   },
   "plugins": {
     "updater": {
-      "createUpdaterArtifacts": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ1QzQxNTc0NUNDQzE0NzkKUldSNUZNeGNkQlhFUmZiUXAyakd1VVl5WENwZHFVMVZ1d2NCbU81OUNyRHdTc3oxV3hudnN2K2cK",
       "endpoints": ["https://github.com/rmstsd/rmst-tools-tauri/releases/latest/download/latest.json"],
       "windows": {

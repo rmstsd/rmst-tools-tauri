@@ -74,7 +74,8 @@ pub fn run() {
       commands::downloadAndInstall,
       commands::saveCommands,
       commands::getCommands,
-      commands::execCommand
+      commands::execCommand,
+      commands::check_update
     ])
     .setup(|app| {
       info!("App setup 启动了");
