@@ -37,7 +37,7 @@ use tauri::Wry;
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_store::StoreExt;
-use urlencoding::encode;
+// use urlencoding::encode;
 
 static Store_Key: &str = "store.json";
 
