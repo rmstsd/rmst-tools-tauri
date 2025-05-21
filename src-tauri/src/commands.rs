@@ -6,10 +6,8 @@
 use log::info;
 // use port_killer::kill;
 use rand::random;
-use serde::de::{self, value};
 use serde::Deserialize;
 use serde::Serialize;
-use serde_json::from_reader;
 use serde_json::from_value;
 use serde_json::json;
 use serde_json::to_string;
@@ -19,25 +17,19 @@ use std::fs::metadata;
 use std::fs::read_dir;
 use std::fs::File;
 use std::io;
-use std::io::BufReader;
 use std::io::Read;
 use std::path::Path;
 use std::vec;
 use std::{fs, path::PathBuf};
-use tauri::image;
 use tauri::image::Image;
-use tauri::webview::PageLoadEvent;
 use tauri::AppHandle;
-use tauri::Listener;
 use tauri::LogicalSize;
 use tauri::Manager;
 use tauri::Size;
 use tauri::WebviewWindow;
-use tauri::Wry;
-// use tauri_plugin_clipboard_manager::ClipboardExt;
+use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_store::StoreExt;
-// use urlencoding::encode;
 
 static Store_Key: &str = "store.json";
 
@@ -423,13 +415,13 @@ pub async fn hideWindow(window: tauri::Window) -> Result<(), String> {
 
 #[tauri::command]
 pub async fn CopyAndPaste(app: AppHandle, content: &str) -> Result<(), String> {
-  // app.clipboard().write_text(content).unwrap();
+  app.clipboard().write_text(content).unwrap();
 
-  // let ww = app.get_webview_window("quickInput").unwrap();
-  // ww.hide();
+  let ww = app.get_webview_window("quickInput").unwrap();
+  ww.hide();
 
-  // use std::{thread, time};
-  // thread::sleep(time::Duration::from_millis(100));
+  use std::{thread, time};
+  thread::sleep(time::Duration::from_millis(100));
 
   // let mut enigo = Enigo::new(&Settings::default()).unwrap();
   // // Paste
