@@ -34,7 +34,7 @@ use tauri::Manager;
 use tauri::Size;
 use tauri::WebviewWindow;
 use tauri::Wry;
-use tauri_plugin_clipboard_manager::ClipboardExt;
+// use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_store::StoreExt;
 // use urlencoding::encode;
@@ -423,19 +423,19 @@ pub async fn hideWindow(window: tauri::Window) -> Result<(), String> {
 
 #[tauri::command]
 pub async fn CopyAndPaste(app: AppHandle, content: &str) -> Result<(), String> {
-  app.clipboard().write_text(content).unwrap();
+  // app.clipboard().write_text(content).unwrap();
 
-  let ww = app.get_webview_window("quickInput").unwrap();
-  ww.hide();
+  // let ww = app.get_webview_window("quickInput").unwrap();
+  // ww.hide();
 
-  use std::{thread, time};
-  thread::sleep(time::Duration::from_millis(100));
+  // use std::{thread, time};
+  // thread::sleep(time::Duration::from_millis(100));
 
-  let mut enigo = Enigo::new(&Settings::default()).unwrap();
-  // Paste
-  enigo.key(Key::Control, Press);
-  enigo.key(Key::Unicode('v'), Click);
-  enigo.key(Key::Control, Release);
+  // let mut enigo = Enigo::new(&Settings::default()).unwrap();
+  // // Paste
+  // enigo.key(Key::Control, Press);
+  // enigo.key(Key::Unicode('v'), Click);
+  // enigo.key(Key::Control, Release);
 
   Ok(())
 }

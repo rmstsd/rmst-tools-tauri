@@ -10,7 +10,7 @@ use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}
 use tauri::{webview, AppHandle, Emitter, LogicalSize, Manager, Window, WindowEvent};
 // use tauri_plugin_autostart::MacosLauncher;
 // use tauri_plugin_autostart::ManagerExt;
-use tauri_plugin_clipboard_manager::ClipboardExt;
+// use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 // use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 use tauri_plugin_log::{Target, TargetKind, TimezoneStrategy};
@@ -38,7 +38,7 @@ pub fn run() {
     .plugin(tauri_plugin_os::init())
     .plugin(tauri_plugin_updater::Builder::new().build())
     .plugin(tauri_plugin_dialog::init())
-    .plugin(tauri_plugin_clipboard_manager::init())
+    // .plugin(tauri_plugin_clipboard_manager::init())
     // .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
     //   let ww = app.get_webview_window("setting");
     //   if let Some(ww) = ww {
