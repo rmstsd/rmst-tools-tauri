@@ -1,8 +1,11 @@
 import { Button, Divider, Form, Input, Message } from '@arco-design/web-react'
 import { IconDelete } from '@arco-design/web-react/icon'
-import { invoke } from '@tauri-apps/api/core'
+// import { invoke } from '@tauri-apps/api/core'
 import { Fragment, useEffect, useState } from 'react'
 
+const invoke = async () => {
+  return new Promise(() => {})
+}
 interface CmdItem {
   label: string
   cmd: string

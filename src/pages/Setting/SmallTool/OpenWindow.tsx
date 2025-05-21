@@ -1,8 +1,12 @@
 import { Button, Form, Input, Link, Typography } from '@arco-design/web-react'
 import { useState } from 'react'
 import { useInterval } from 'ahooks'
-import { invoke } from '@tauri-apps/api/core'
+// import { invoke } from '@tauri-apps/api/core'
 import { getAllWebviewWindows } from '@tauri-apps/api/webviewWindow'
+
+const invoke = async () => {
+  return new Promise(() => {})
+}
 
 const OpenWindow = () => {
   const [form] = Form.useForm()

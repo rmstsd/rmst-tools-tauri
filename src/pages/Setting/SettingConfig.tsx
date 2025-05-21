@@ -4,8 +4,8 @@ import { info as logInfo, error as logError } from '@tauri-apps/plugin-log'
 import { Button, Divider, Form, Input, Link, Message, Modal, Switch, Tag, Typography } from '@arco-design/web-react'
 import { IconDelete } from '@arco-design/web-react/icon'
 import { useEffect, useState } from 'react'
-import { check } from '@tauri-apps/plugin-updater'
-import { relaunch } from '@tauri-apps/plugin-process'
+// import { check } from '@tauri-apps/plugin-updater'
+// import { relaunch } from '@tauri-apps/plugin-process'
 
 const format = (dateTime: string) => {
   return new Intl.DateTimeFormat('zh', {
@@ -72,109 +72,100 @@ export default function Setting() {
   }
 
   const checkUpdate = async () => {
-    setLoading(true)
-    try {
-      const update = await check()
-
-      if (update) {
-        console.log('有新版本', update)
-        Modal.confirm({
-          title: '发现新版本',
-          content: (
-            <div>
-              <Typography.Title heading={5}>新版本: {update.version}</Typography.Title>
-              <Typography.Paragraph>当前版本: {update.currentVersion}</Typography.Paragraph>
-              <Typography.Paragraph>发布时间: {format(update.date)}</Typography.Paragraph>
-            </div>
-          ),
-          okText: '下载-更新-重启',
-          async onOk() {
-            console.log('确定 下载')
-            logInfo('确定 下载')
-
-            await update.downloadAndInstall(event => {
-              switch (event.event) {
-                case 'Started':
-                  logInfo('started downloading')
-                  console.log(`started downloading ${event.data.contentLength} bytes`)
-                  break
-                case 'Progress':
-                  logInfo('downloaded ing')
-                  console.log(`downloaded ${event.data} `)
-                  break
-                case 'Finished':
-                  logInfo('download finished')
-                  console.log('download finished')
-                  break
-              }
-            })
-
-            console.log('update installed')
-            logInfo('update installed')
-            await relaunch()
-
-            return
-
-            // info.download(progress => {
-            //   console.log('progress', progress)
-
-            //   if (progress.event === 'Finished') {
-            //     Modal.confirm({
-            //       title: '下载完成',
-            //       content: '更新吗?',
-            //       async onOk() {
-            //         logInfo('确定 更新')
-
-            //         info.install().then(() => {
-            //           logInfo('更新完成')
-            //           console.log('更新完成')
-            //           relaunch()
-            //         })
-            //       }
-            //     })
-            //   }
-            // })
-          }
-        })
-      } else {
-        console.log('没有新版本')
-
-        Message.info({ content: '没有新版本' })
-      }
-    } catch (err: any) {
-      console.log(err)
-    } finally {
-      setLoading(false)
-    }
+    // setLoading(true)
+    // try {
+    //   const update = await check()
+    //   if (update) {
+    //     console.log('有新版本', update)
+    //     Modal.confirm({
+    //       title: '发现新版本',
+    //       content: (
+    //         <div>
+    //           <Typography.Title heading={5}>新版本: {update.version}</Typography.Title>
+    //           <Typography.Paragraph>当前版本: {update.currentVersion}</Typography.Paragraph>
+    //           <Typography.Paragraph>发布时间: {format(update.date)}</Typography.Paragraph>
+    //         </div>
+    //       ),
+    //       okText: '下载-更新-重启',
+    //       async onOk() {
+    //         console.log('确定 下载')
+    //         logInfo('确定 下载')
+    //         await update.downloadAndInstall(event => {
+    //           switch (event.event) {
+    //             case 'Started':
+    //               logInfo('started downloading')
+    //               console.log(`started downloading ${event.data.contentLength} bytes`)
+    //               break
+    //             case 'Progress':
+    //               logInfo('downloaded ing')
+    //               console.log(`downloaded ${event.data} `)
+    //               break
+    //             case 'Finished':
+    //               logInfo('download finished')
+    //               console.log('download finished')
+    //               break
+    //           }
+    //         })
+    //         console.log('update installed')
+    //         logInfo('update installed')
+    //         await relaunch()
+    //         return
+    //         // info.download(progress => {
+    //         //   console.log('progress', progress)
+    //         //   if (progress.event === 'Finished') {
+    //         //     Modal.confirm({
+    //         //       title: '下载完成',
+    //         //       content: '更新吗?',
+    //         //       async onOk() {
+    //         //         logInfo('确定 更新')
+    //         //         info.install().then(() => {
+    //         //           logInfo('更新完成')
+    //         //           console.log('更新完成')
+    //         //           relaunch()
+    //         //         })
+    //         //       }
+    //         //     })
+    //         //   }
+    //         // })
+    //       }
+    //     })
+    //   } else {
+    //     console.log('没有新版本')
+    //     Message.info({ content: '没有新版本' })
+    //   }
+    // } catch (err: any) {
+    //   console.log(err)
+    // } finally {
+    //   setLoading(false)
+    // }
   }
 
   const checkUpdate_v2 = async () => {
-    const update = await check()
-    console.log('update', update)
-    if (update) {
-      console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`)
-      let downloaded = 0
-      let contentLength = 0
-      // alternatively we could also call update.download() and update.install() separately
-      await update.downloadAndInstall(event => {
-        switch (event.event) {
-          case 'Started':
-            contentLength = event.data.contentLength
-            console.log(`started downloading ${event.data.contentLength} bytes`)
-            break
-          case 'Progress':
-            downloaded += event.data.chunkLength
-            console.log(`downloaded ${downloaded} from ${contentLength}`)
-            break
-          case 'Finished':
-            console.log('download finished')
-            break
-        }
-      })
-
-      console.log('update installed')
-      await relaunch()
-    }
+    // const update = await check()
+    // console.log('update', update)
+    // if (update) {
+    //   console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`)
+    //   let downloaded = 0
+    //   let contentLength = 0
+    //   // alternatively we could also call update.download() and update.install() separately
+    //   await update.downloadAndInstall(event => {
+    //     switch (event.event) {
+    //       case 'Started':
+    //         contentLength = event.data.contentLength
+    //         console.log(`started downloading ${event.data.contentLength} bytes`)
+    //         break
+    //       case 'Progress':
+    //         downloaded += event.data.chunkLength
+    //         console.log(`downloaded ${downloaded} from ${contentLength}`)
+    //         break
+    //       case 'Finished':
+    //         console.log('download finished')
+    //         break
+    //     }
+    //   })
+    //   console.log('update installed')
+    //   await relaunch()
+    // }
   }
 
   interface Update {
