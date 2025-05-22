@@ -5,14 +5,9 @@ import clsx from 'clsx'
 
 import ResizeObserver from 'rc-resize-observer'
 import { SettingData } from '../type'
-// import { invoke } from '@tauri-apps/api/core'
-
-const invoke = async () => {
-  return new Promise(() => {})
-}
+import { invoke } from '@tauri-apps/api/core'
 
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
-import { resourceUsage } from 'process'
 
 interface Props {
   onFocus?: () => void

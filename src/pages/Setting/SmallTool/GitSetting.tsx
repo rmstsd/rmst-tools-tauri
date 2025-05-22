@@ -1,6 +1,6 @@
 import { Button, Form, Message, Radio } from '@arco-design/web-react'
+import { invoke } from '@tauri-apps/api/core'
 import { useState } from 'react'
-import { Set_Git_Ignorecase } from '@renderer/ipc/killPort'
 
 export default function GitSetting() {
   const [gitLoading, setGitLoading] = useState(false)
@@ -25,7 +25,7 @@ export default function GitSetting() {
 
             const value = form.getFieldValue('ignorecase')
 
-            Set_Git_Ignorecase(value)
+            invoke('Set_Git_Ignorecase', value)
               .then(() => {
                 Message.success({ content: '设置成功', position: 'bottom' })
               })

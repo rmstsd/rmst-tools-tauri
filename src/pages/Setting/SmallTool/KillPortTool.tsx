@@ -1,9 +1,7 @@
 import { Button, Form, InputNumber, Message } from '@arco-design/web-react'
-// import { invoke } from '@tauri-apps/api/core'
+import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useRef, useState } from 'react'
-const invoke = async () => {
-  return new Promise(() => {})
-}
+
 export default function KillPortTool() {
   const ref = useRef(null)
 

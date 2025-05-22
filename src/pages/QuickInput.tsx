@@ -1,13 +1,9 @@
 import { Button } from '@arco-design/web-react'
-// import { invoke } from '@tauri-apps/api/core'
+import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useState } from 'react'
 import ResizeObserver from 'rc-resize-observer'
 import { SettingData } from '../type'
 import clsx from 'clsx'
-
-const invoke = async () => {
-  return new Promise(() => {})
-}
 
 export default function QuickInput() {
   const [notes, setNotes] = useState([])
