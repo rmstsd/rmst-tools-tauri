@@ -3665,7 +3665,7 @@ dependencies = [
 
 [[package]]
 name = "rmst-tools-tauri"
-version = "0.2.11"
+version = "0.2.17"
 dependencies = [
  "enigo",
  "log",
