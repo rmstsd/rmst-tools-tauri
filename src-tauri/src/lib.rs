@@ -39,13 +39,6 @@ pub fn run() {
     .plugin(tauri_plugin_updater::Builder::new().build())
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_clipboard_manager::init())
-    .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-      // let ww = app.get_webview_window("setting");
-      // if let Some(ww) = ww {
-      //   ww.show();
-      //   ww.set_focus();
-      // }
-    }))
     .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![
@@ -76,6 +69,17 @@ pub fn run() {
       commands::check_update
     ])
     .setup(|app| {
+      #[cfg(desktop)]
+      app
+        .handle()
+        .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+          let ww = app.get_webview_window("setting");
+          if let Some(ww) = ww {
+            ww.show();
+            ww.set_focus();
+          }
+        }));
+
       info!("App setup 启动了");
       // let handle = app.handle().clone();
       // tauri::async_runtime::spawn(async move {
