@@ -8,11 +8,11 @@ use log::{info, trace, warn};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{webview, AppHandle, Emitter, LogicalSize, Manager, Window, WindowEvent};
-// use tauri_plugin_autostart::MacosLauncher;
-// use tauri_plugin_autostart::ManagerExt;
-// use tauri_plugin_clipboard_manager::ClipboardExt;
+use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_autostart::ManagerExt;
+use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
-// use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
+use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 use tauri_plugin_log::{Target, TargetKind, TimezoneStrategy};
 use tauri_plugin_updater::UpdaterExt;
 // use tokio::time::{sleep, Duration};
@@ -20,10 +20,10 @@ use tauri_plugin_updater::UpdaterExt;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
-    // .plugin(tauri_plugin_autostart::init(
-    //   MacosLauncher::LaunchAgent,
-    //   Some(vec![]),
-    // ))
+    .plugin(tauri_plugin_autostart::init(
+      MacosLauncher::LaunchAgent,
+      Some(vec![]),
+    ))
     .plugin(
       tauri_plugin_log::Builder::new()
         .timezone_strategy(TimezoneStrategy::UseLocal)
@@ -38,7 +38,7 @@ pub fn run() {
     .plugin(tauri_plugin_os::init())
     .plugin(tauri_plugin_updater::Builder::new().build())
     .plugin(tauri_plugin_dialog::init())
-    // .plugin(tauri_plugin_clipboard_manager::init())
+    .plugin(tauri_plugin_clipboard_manager::init())
     // .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
     //   let ww = app.get_webview_window("setting");
     //   if let Some(ww) = ww {
@@ -82,16 +82,16 @@ pub fn run() {
       //   update(handle).await.unwrap();
       // });
 
-      // // 获取自动启动管理器
-      // let autostart_manager = app.autolaunch();
-      // let isEnabled = autostart_manager.is_enabled();
+      // 获取自动启动管理器
+      let autostart_manager = app.autolaunch();
+      let isEnabled = autostart_manager.is_enabled();
 
-      // dbg!(&isEnabled);
-      // if (isEnabled.unwrap_or_default()) {
-      //   // autostart_manager.disable();
-      // } else {
-      //   autostart_manager.enable();
-      // }
+      dbg!(&isEnabled);
+      if (isEnabled.unwrap_or_default()) {
+        // autostart_manager.disable();
+      } else {
+        autostart_manager.enable();
+      }
 
       let ww = app.get_webview_window("openFolder").unwrap();
       ww.eval(
@@ -151,86 +151,86 @@ pub fn run() {
         })
         .build(app)?;
 
-      // {
-      //   use tauri_plugin_global_shortcut::{
-      //     Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState,
-      //   };
+      {
+        use tauri_plugin_global_shortcut::{
+          Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState,
+        };
 
-      //   let alt_space_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
-      //   let alt_v_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyV);
-      //   let alt_r_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyR);
+        let alt_space_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
+        let alt_v_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyV);
+        let alt_r_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyR);
 
-      //   app.handle().plugin(
-      //     tauri_plugin_global_shortcut::Builder::new()
-      //       .with_handler(move |_app, shortcut, event| {
-      //         if shortcut == &alt_space_shortcut {
-      //           match event.state() {
-      //             ShortcutState::Pressed => {
-      //               let openFolderWindows = _app.get_webview_window("openFolder").unwrap();
+        app.handle().plugin(
+          tauri_plugin_global_shortcut::Builder::new()
+            .with_handler(move |_app, shortcut, event| {
+              if shortcut == &alt_space_shortcut {
+                match event.state() {
+                  ShortcutState::Pressed => {
+                    let openFolderWindows = _app.get_webview_window("openFolder").unwrap();
 
-      //               let isVisible = openFolderWindows.is_visible().unwrap_or_default();
-      //               if isVisible {
-      //                 if openFolderWindows.is_focused().expect("is_focused msg") {
-      //                   openFolderWindows.hide();
-      //                 } else {
-      //                   openFolderWindows.set_focus();
-      //                 }
-      //               } else {
-      //                 openFolderWindows.show();
-      //                 openFolderWindows.set_focus();
-      //               }
-      //             }
-      //             ShortcutState::Released => {
-      //               // println!("Ctrl-N Released!");
-      //             }
-      //           }
-      //         }
-      //         if shortcut == &alt_v_shortcut {
-      //           match event.state() {
-      //             ShortcutState::Pressed => {
-      //               let ww = _app.get_webview_window("quickInput").unwrap();
+                    let isVisible = openFolderWindows.is_visible().unwrap_or_default();
+                    if isVisible {
+                      if openFolderWindows.is_focused().expect("is_focused msg") {
+                        openFolderWindows.hide();
+                      } else {
+                        openFolderWindows.set_focus();
+                      }
+                    } else {
+                      openFolderWindows.show();
+                      openFolderWindows.set_focus();
+                    }
+                  }
+                  ShortcutState::Released => {
+                    // println!("Ctrl-N Released!");
+                  }
+                }
+              }
+              if shortcut == &alt_v_shortcut {
+                match event.state() {
+                  ShortcutState::Pressed => {
+                    let ww = _app.get_webview_window("quickInput").unwrap();
 
-      //               if ww.is_visible().unwrap_or(false) {
-      //                 ww.hide();
-      //               } else {
-      //                 let pos = ww.cursor_position().unwrap();
-      //                 ww.set_position(pos);
-      //                 ww.show();
-      //                 ww.set_focus();
-      //               }
-      //             }
-      //             ShortcutState::Released => {
-      //               // println!("Ctrl-N Released!");
-      //             }
-      //           }
-      //         }
-      //         if shortcut == &alt_r_shortcut {
-      //           dbg!(&"alt + r");
-      //           match event.state() {
-      //             ShortcutState::Pressed => {
-      //               let ww = _app.get_webview_window("setting").unwrap();
-      //               ww.unminimize();
-      //               ww.show();
-      //               ww.set_focus();
+                    if ww.is_visible().unwrap_or(false) {
+                      ww.hide();
+                    } else {
+                      let pos = ww.cursor_position().unwrap();
+                      ww.set_position(pos);
+                      ww.show();
+                      ww.set_focus();
+                    }
+                  }
+                  ShortcutState::Released => {
+                    // println!("Ctrl-N Released!");
+                  }
+                }
+              }
+              if shortcut == &alt_r_shortcut {
+                dbg!(&"alt + r");
+                match event.state() {
+                  ShortcutState::Pressed => {
+                    let ww = _app.get_webview_window("setting").unwrap();
+                    ww.unminimize();
+                    ww.show();
+                    ww.set_focus();
 
-      //               let clipboard_text = _app.clipboard().read_text().unwrap_or_default();
-      //               let text = clipboard_text.trim().to_string();
+                    let clipboard_text = _app.clipboard().read_text().unwrap_or_default();
+                    let text = clipboard_text.trim().to_string();
 
-      //               _app.emit_to("setting", "showQrCode", text);
-      //             }
-      //             ShortcutState::Released => {
-      //               // println!("Ctrl-N Released!");
-      //             }
-      //           }
-      //         }
-      //       })
-      //       .build(),
-      //   )?;
+                    _app.emit_to("setting", "showQrCode", text);
+                  }
+                  ShortcutState::Released => {
+                    // println!("Ctrl-N Released!");
+                  }
+                }
+              }
+            })
+            .build(),
+        )?;
 
-      //   app.global_shortcut().register(alt_space_shortcut);
-      //   app.global_shortcut().register(alt_v_shortcut);
-      //   app.global_shortcut().register(alt_r_shortcut);
-      // }
+        app.global_shortcut().register(alt_space_shortcut);
+        app.global_shortcut().register(alt_v_shortcut);
+        app.global_shortcut().register(alt_r_shortcut);
+      }
       return Ok(());
     })
     .on_window_event(|window, evt| match evt {
