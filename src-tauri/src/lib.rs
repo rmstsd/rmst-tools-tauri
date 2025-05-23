@@ -103,16 +103,16 @@ pub fn run() {
       dbg!(&payload.event());
     })
     .setup(|app| {
-      // #[cfg(desktop)]
-      // app
-      //   .handle()
-      //   .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-      //     let ww = app.get_webview_window("setting");
-      //     if let Some(ww) = ww {
-      //       ww.show();
-      //       ww.set_focus();
-      //     }
-      //   }));
+      #[cfg(desktop)]
+      app
+        .handle()
+        .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+          let ww = app.get_webview_window("setting");
+          if let Some(ww) = ww {
+            ww.show();
+            ww.set_focus();
+          }
+        }));
 
       info!("App setup 启动了");
       // let handle = app.handle().clone();
