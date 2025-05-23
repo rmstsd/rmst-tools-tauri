@@ -19,55 +19,9 @@ use tauri_plugin_updater::UpdaterExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
-    .plugin(tauri_plugin_autostart::init(
-      MacosLauncher::LaunchAgent,
-      Some(vec![]),
-    ))
-    .plugin(
-      tauri_plugin_log::Builder::new()
-        .timezone_strategy(TimezoneStrategy::UseLocal)
-        .targets([
-          Target::new(TargetKind::Stdout),
-          Target::new(TargetKind::LogDir { file_name: None }),
-          Target::new(TargetKind::Webview),
-        ])
-        .build(),
-    )
-    .plugin(tauri_plugin_process::init())
-    .plugin(tauri_plugin_os::init())
-    .plugin(tauri_plugin_updater::Builder::new().build())
-    .plugin(tauri_plugin_dialog::init())
-    .plugin(tauri_plugin_clipboard_manager::init())
-    .plugin(tauri_plugin_store::Builder::default().build())
-    .plugin(tauri_plugin_opener::init())
-    .invoke_handler(tauri::generate_handler![
-      commands::openWin,
-      commands::importSetting,
-      commands::exportSetting,
-      commands::saveSetting,
-      commands::getSetting,
-      commands::clearStore,
-      commands::getHistoryOpenedUrls,
-      commands::clearHistoryOpenedUrls,
-      commands::killPort,
-      commands::getProjectNamesTree,
-      commands::openFolderEditor,
-      commands::hideDirWindow,
-      commands::setDirWindowSize,
-      commands::page_loaded,
-      commands::hideWindow,
-      commands::CopyAndPaste,
-      commands::updateQuickInputWindowSize,
-      commands::hideQuickInputWindow,
-      commands::get_package_info,
-      commands::checkUpdateRust,
-      commands::downloadAndInstall,
-      commands::saveCommands,
-      commands::getCommands,
-      commands::execCommand,
-      commands::check_update
-    ])
+  let builder = tauri::Builder::default();
+
+  builder
     .setup(|app| {
       #[cfg(desktop)]
       app
@@ -237,6 +191,54 @@ pub fn run() {
       }
       return Ok(());
     })
+    .plugin(tauri_plugin_autostart::init(
+      MacosLauncher::LaunchAgent,
+      Some(vec![]),
+    ))
+    .plugin(
+      tauri_plugin_log::Builder::new()
+        .timezone_strategy(TimezoneStrategy::UseLocal)
+        .targets([
+          Target::new(TargetKind::Stdout),
+          Target::new(TargetKind::LogDir { file_name: None }),
+          Target::new(TargetKind::Webview),
+        ])
+        .build(),
+    )
+    .plugin(tauri_plugin_process::init())
+    .plugin(tauri_plugin_os::init())
+    .plugin(tauri_plugin_updater::Builder::new().build())
+    .plugin(tauri_plugin_dialog::init())
+    .plugin(tauri_plugin_clipboard_manager::init())
+    .plugin(tauri_plugin_store::Builder::default().build())
+    .plugin(tauri_plugin_opener::init())
+    .invoke_handler(tauri::generate_handler![
+      commands::openWin,
+      commands::importSetting,
+      commands::exportSetting,
+      commands::saveSetting,
+      commands::getSetting,
+      commands::clearStore,
+      commands::getHistoryOpenedUrls,
+      commands::clearHistoryOpenedUrls,
+      commands::killPort,
+      commands::getProjectNamesTree,
+      commands::openFolderEditor,
+      commands::hideDirWindow,
+      commands::setDirWindowSize,
+      commands::page_loaded,
+      commands::hideWindow,
+      commands::CopyAndPaste,
+      commands::updateQuickInputWindowSize,
+      commands::hideQuickInputWindow,
+      commands::get_package_info,
+      commands::checkUpdateRust,
+      commands::downloadAndInstall,
+      commands::saveCommands,
+      commands::getCommands,
+      commands::execCommand,
+      commands::check_update
+    ])
     .on_window_event(|window, evt| match evt {
       WindowEvent::CloseRequested { api, .. } => match window.label() {
         "setting" | "openFolder" | "quickInput" => {
