@@ -14,3 +14,7 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
 
 You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+
+# tauri 下载 NSIS 慢的问题
+
+参见: https://github.com/tauri-apps/tauri/issues/7338#issuecomment-2389254289
