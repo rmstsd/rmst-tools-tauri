@@ -10,6 +10,7 @@
     "dev-web": "vite",
     "build-web": "vite build",
     "preview": "vite preview",
+    "del-tag": "node ./scripts/del-tag.mjs",
     "release": "release-it patch --ci"
   },
   "dependencies": {
