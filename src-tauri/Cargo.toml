@@ -1,6 +1,6 @@
 [package]
 name = "rmst-tools-tauri"
-version = "0.2.23"
+version = "0.2.24"
 description = "a tools by tauri"
 authors = ["人美声甜"]
 edition = "2021"
